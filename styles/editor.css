@@ -1,0 +1,12 @@
+.code-highlight {
+  background-color: #ffff0077;
+}
+
+.breakpoint-glyph {
+  box-sizing: border-box;
+  padding: 4%;
+  border-radius: 50%;
+  margin-left: 10px;
+  background-color: #ff5555;
+  background-clip: content-box;
+}
