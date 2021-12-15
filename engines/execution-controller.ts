@@ -12,6 +12,7 @@ type ExecuteAllArgs<RS> = {
 
 class ExecutionController<RS> {
   private _engine: LanguageEngine<RS>;
+  private _breakpoints: number[] = [];
   private _result: StepExecutionResult<RS> | null;
 
   /**
@@ -42,12 +43,20 @@ class ExecutionController<RS> {
     this._engine.prepare(code, input);
   }
 
+  /**
+   * Update debugging breakpoints
+   * @param points Array of line numbers having breakpoints
+   */
+  updateBreakpoints(points: number[]) {
+    this._breakpoints = points;
+  }
+
   async executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
     while (true) {
       this._result = this._engine.executeStep();
       onResult && onResult(this._result);
       if (!this._result.nextStepLocation) break;
-      if (interval) await this.sleep(interval);
+      await this.sleep(interval || 0);
     }
     return this._result;
   }

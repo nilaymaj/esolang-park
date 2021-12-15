@@ -1,5 +1,6 @@
 import { StepExecutionResult } from "./types";
 
+/** Types of requests the worker handles */
 export type WorkerRequestData =
   | {
       type: "Init";
@@ -14,10 +15,18 @@ export type WorkerRequestData =
       params: { code: string; input: string };
     }
   | {
+      type: "UpdateBreakpoints";
+      params: { points: number[] };
+    }
+  | {
       type: "Execute";
       params: { interval?: number };
     };
 
+/** Kinds of acknowledgement responses the worker can send  */
+export type WorkerAckType = "init" | "reset" | "bp-update" | "prepare";
+
+/** Types of responses the worker can send */
 export type WorkerResponseData<RS> =
-  | { type: "state"; data: "empty" | "ready" }
+  | { type: "ack"; data: WorkerAckType }
   | { type: "result"; data: StepExecutionResult<RS> };

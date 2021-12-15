@@ -25,7 +25,7 @@ export const useExecController = <RS>() => {
   const [workerState, setWorkerState] = React.useState<WorkerState>("loading");
 
   /**
-   * Semi-typesafe wrapper to abstract request-response cycle into
+   * Type-safe wrapper to abstract request-response cycle into
    * a simple imperative asynchronous call. Returns Promise that resolves
    * with response data.
    *
@@ -34,7 +34,7 @@ export const useExecController = <RS>() => {
    *
    * @param request Data to send in request
    * @param onData Optional argument - if passed, function enters response-streaming mode.
-   * Callback called with response data. Return `true` to keep the connection alive, `false` to end.
+   * Callback is called with response data. Return `true` to keep the connection alive, `false` to end.
    * On end, promise resolves with last (already used) response data.
    */
   const requestWorker = (
@@ -61,6 +61,14 @@ export const useExecController = <RS>() => {
     });
   };
 
+  /** Utility to throw error on unexpected response */
+  const throwUnexpectedRes = (
+    fnName: string,
+    res: WorkerResponseData<RS>
+  ): never => {
+    throw new Error(`Unexpected response on ${fnName}: ${res.toString()}`);
+  };
+
   // Initialization and cleanup of web worker
   React.useEffect(() => {
     (async () => {
@@ -68,10 +76,9 @@ export const useExecController = <RS>() => {
       workerRef.current = new Worker(
         new URL("../engines/worker.ts", import.meta.url)
       );
-      const resp = await requestWorker({ type: "Init" });
-      if (resp.type === "state" && resp.data === "empty")
-        setWorkerState("empty");
-      else throw new Error(`Unexpected response on init: ${resp}`);
+      const res = await requestWorker({ type: "Init" });
+      if (res.type === "ack" && res.data === "init") setWorkerState("empty");
+      else throwUnexpectedRes("init", res);
     })();
 
     return () => {
@@ -91,8 +98,25 @@ export const useExecController = <RS>() => {
       type: "Prepare",
       params: { code, input },
     });
-    if (res.type === "state" && res.data === "ready") setWorkerState("ready");
-    else throw new Error(`Unexpected response on loadCode: ${res.toString()}`);
+    if (res.type === "ack" && res.data === "prepare") setWorkerState("ready");
+    else throwUnexpectedRes("loadCode", res);
+  }, []);
+
+  /**
+   * Update debugging breakpoints in the execution controller.
+   * @param points Array of line numbers having breakpoints
+   */
+  const updateBreakpoints = React.useCallback(async (points: number[]) => {
+    await requestWorker(
+      {
+        type: "UpdateBreakpoints",
+        params: { points },
+      },
+      (res) => {
+        if (res.type === "ack" && res.data === "bp-update") return false;
+        else return true;
+      }
+    );
   }, []);
 
   /**
@@ -100,9 +124,8 @@ export const useExecController = <RS>() => {
    */
   const resetState = React.useCallback(async () => {
     const res = await requestWorker({ type: "Reset" });
-    if (res.type === "state" && res.data === "empty") setWorkerState("empty");
-    else
-      throw new Error(`Unexpected response on resetState: ${res.toString()}`);
+    if (res.type === "ack" && res.data === "reset") setWorkerState("empty");
+    else throwUnexpectedRes("resetState", res);
   }, []);
 
   /**
@@ -117,7 +140,7 @@ export const useExecController = <RS>() => {
       setWorkerState("processing");
       // Set up a streaming-response cycle with the worker
       await requestWorker({ type: "Execute", params: { interval } }, (res) => {
-        if (res.type !== "result") return false; // TODO: Throw error here
+        if (res.type !== "result") return true;
         onResult(res.data);
         if (res.data.nextStepLocation) return true;
         // Clean up and terminate response stream
@@ -128,8 +151,11 @@ export const useExecController = <RS>() => {
     []
   );
 
-  return React.useMemo(
-    () => ({ state: workerState, resetState, prepare, executeAll }),
-    [workerState, resetState, prepare, executeAll]
-  );
+  return {
+    state: workerState,
+    resetState,
+    prepare,
+    executeAll,
+    updateBreakpoints,
+  };
 };

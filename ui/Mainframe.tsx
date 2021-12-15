@@ -4,14 +4,12 @@ import { InputEditor, InputEditorRef } from "../ui/input-editor";
 import { MainLayout } from "../ui/MainLayout";
 import { useExecController } from "../ui/use-exec-controller";
 import { DocumentRange, LanguageProvider } from "../engines/types";
-import SampleLangProvider from "../engines/sample-lang";
 import BrainfuckProvider from "../engines/brainfuck";
 import { OutputViewer } from "../ui/output-viewer";
 
 export const Mainframe = () => {
   const codeEditorRef = React.useRef<CodeEditorRef>(null);
   const inputEditorRef = React.useRef<InputEditorRef>(null);
-  // const providerRef = React.useRef<LanguageProvider<any>>(SampleLangProvider);
   const providerRef = React.useRef<LanguageProvider<any>>(BrainfuckProvider);
   const execController = useExecController();
 
@@ -66,7 +64,9 @@ export const Mainframe = () => {
           highlights={codeHighlights}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
-          onUpdateBreakpoints={(newPoints) => console.log(newPoints)}
+          onUpdateBreakpoints={(newPoints) =>
+            execController.updateBreakpoints(newPoints)
+          }
         />
       )}
       renderRenderer={() => (

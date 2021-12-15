@@ -1,16 +1,17 @@
 import BrainfuckLanguageEngine from "./brainfuck/engine";
 import ExecutionController from "./execution-controller";
-import SampleLanguageEngine from "./sample-lang/engine";
 import { StepExecutionResult } from "./types";
-import { WorkerRequestData, WorkerResponseData } from "./worker-constants";
+import {
+  WorkerAckType,
+  WorkerRequestData,
+  WorkerResponseData,
+} from "./worker-constants";
 
 let _controller: ExecutionController<any> | null = null;
 
-/** Create a worker response for state update */
-const stateMessage = <RS>(
-  state: "empty" | "ready"
-): WorkerResponseData<RS> => ({
-  type: "state",
+/** Create a worker response for update acknowledgement */
+const ackMessage = <RS>(state: WorkerAckType): WorkerResponseData<RS> => ({
+  type: "ack",
   data: state,
 });
 
@@ -26,10 +27,9 @@ const resultMessage = <RS>(
  * Initialize the execution controller.
  */
 const initController = () => {
-  // const engine = new SampleLanguageEngine();
   const engine = new BrainfuckLanguageEngine();
   _controller = new ExecutionController(engine);
-  postMessage(stateMessage("empty"));
+  postMessage(ackMessage("init"));
 };
 
 /**
@@ -38,7 +38,7 @@ const initController = () => {
  */
 const resetController = () => {
   _controller!.resetState();
-  postMessage(stateMessage("empty"));
+  postMessage(ackMessage("reset"));
 };
 
 /**
@@ -47,7 +47,16 @@ const resetController = () => {
  */
 const prepare = ({ code, input }: { code: string; input: string }) => {
   _controller!.prepare(code, input);
-  postMessage(stateMessage("ready"));
+  postMessage(ackMessage("prepare"));
+};
+
+/**
+ * Update debugging breakpoints
+ * @param points List of line numbers having breakpoints
+ */
+const updateBreakpoints = (points: number[]) => {
+  _controller!.updateBreakpoints(points);
+  postMessage(ackMessage("bp-update"));
 };
 
 /**
@@ -67,5 +76,7 @@ addEventListener("message", (ev: MessageEvent<WorkerRequestData>) => {
   if (ev.data.type === "Reset") return resetController();
   if (ev.data.type === "Prepare") return prepare(ev.data.params);
   if (ev.data.type === "Execute") return execute(ev.data.params.interval);
+  if (ev.data.type === "UpdateBreakpoints")
+    return updateBreakpoints(ev.data.params.points);
   throw new Error("Invalid worker message type");
 });
