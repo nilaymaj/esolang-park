@@ -24,6 +24,7 @@ const DebugControls = (props: {
   paused: boolean;
   onPause: () => void;
   onResume: () => void;
+  onStep: () => void;
   onStop: () => void;
 }) => {
   return (
@@ -37,6 +38,7 @@ const DebugControls = (props: {
       <Button
         small
         title="Step"
+        onClick={props.onStep}
         disabled={!props.paused}
         icon={<Icon icon="step-forward" intent="warning" />}
       />
@@ -55,6 +57,7 @@ type Props = {
   onRun: () => void;
   onPause: () => void;
   onResume: () => void;
+  onStep: () => void;
   onStop: () => void;
 };
 
@@ -68,6 +71,7 @@ export const ExecutionControls = (props: Props) => {
           paused={props.state === "paused"}
           onPause={props.onPause}
           onResume={props.onResume}
+          onStep={props.onStep}
           onStop={props.onStop}
         />
       )}

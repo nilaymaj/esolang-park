@@ -141,6 +141,20 @@ export const useExecController = <RS>() => {
   }, []);
 
   /**
+   * Run a single step of execution
+   * @return Execution result
+   */
+  const executeStep = React.useCallback(async () => {
+    const res = await requestWorker(
+      { type: "ExecuteStep" },
+      (res) => res.type !== "result"
+    );
+    if (res.type !== "result") throw new Error("Something unexpected happened");
+    if (!res.data.nextStepLocation) setWorkerState("done");
+    return res.data;
+  }, []);
+
+  /**
    * Execute the code loaded into the engine
    * @param onResult Callback used when an execution result is received
    */
@@ -172,6 +186,7 @@ export const useExecController = <RS>() => {
     prepare,
     pauseExecution,
     execute,
+    executeStep,
     updateBreakpoints,
   };
 };

@@ -64,7 +64,6 @@ const updateBreakpoints = (points: number[]) => {
  * and return result of execution.
  */
 const execute = (interval?: number) => {
-  console.info(`Executing at interval ${interval}`);
   _controller!.executeAll({
     interval,
     onResult: (res) => postMessage(resultMessage(res)),
@@ -79,12 +78,21 @@ const pauseExecution = async () => {
   postMessage(ackMessage("pause"));
 };
 
+/**
+ * Run a single execution step
+ */
+const executeStep = () => {
+  const result = _controller!.executeStep();
+  postMessage(resultMessage(result));
+};
+
 addEventListener("message", async (ev: MessageEvent<WorkerRequestData>) => {
   if (ev.data.type === "Init") return initController();
   if (ev.data.type === "Reset") return resetController();
   if (ev.data.type === "Prepare") return prepare(ev.data.params);
   if (ev.data.type === "Execute") return execute(ev.data.params.interval);
   if (ev.data.type === "Pause") return await pauseExecution();
+  if (ev.data.type === "ExecuteStep") return executeStep();
   if (ev.data.type === "UpdateBreakpoints")
     return updateBreakpoints(ev.data.params.points);
   throw new Error("Invalid worker message type");

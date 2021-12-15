@@ -23,6 +23,10 @@ export type WorkerRequestData =
       params: { interval?: number };
     }
   | {
+      type: "ExecuteStep";
+      params?: null;
+    }
+  | {
       type: "Pause";
       params?: null;
     };

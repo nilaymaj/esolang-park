@@ -57,6 +57,21 @@ export const Mainframe = () => {
     await execController.pauseExecution();
   };
 
+  /** Run a single step of execution */
+  const executeStep = async () => {
+    // Check if controller is paused
+    if (execController.state !== "paused") {
+      console.error("Controller not paused");
+      return;
+    }
+
+    // Run and update execution states
+    const result = await execController.executeStep();
+    setRendererState(result.rendererState);
+    setCodeHighlights(result.nextStepLocation || undefined);
+    setOutput((o) => (o || "") + (result.output || ""));
+  };
+
   /** Resume the currently paused execution */
   const resumeExecution = async () => {
     // Check if controller is indeed paused
@@ -125,6 +140,7 @@ export const Mainframe = () => {
           onRun={runProgram}
           onPause={pauseExecution}
           onResume={resumeExecution}
+          onStep={executeStep}
           onStop={stopExecution}
         />
       )}

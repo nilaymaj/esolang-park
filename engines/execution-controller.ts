@@ -134,6 +134,16 @@ class ExecutionController<RS> {
     return this._result;
   }
 
+  /**
+   * Run a single step of execution
+   * @returns Result of execution
+   */
+  executeStep(): StepExecutionResult<RS> {
+    this._result = this._engine.executeStep();
+    this._result.signal = "paused";
+    return this._result;
+  }
+
   /** Asynchronously sleep for a period of time */
   private async sleep(millis: number) {
     return new Promise<void>((resolve) => setTimeout(resolve, millis));
