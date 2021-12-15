@@ -66,6 +66,7 @@ export const Mainframe = () => {
           highlights={codeHighlights}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
+          onUpdateBreakpoints={(newPoints) => console.log(newPoints)}
         />
       )}
       renderRenderer={() => (

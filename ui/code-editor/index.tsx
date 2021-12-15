@@ -1,24 +1,9 @@
 import React from "react";
 import Editor, { useMonaco } from "@monaco-editor/react";
-import monaco from "monaco-editor";
+import { useEditorLanguageConfig } from "./use-editor-lang-config";
 import { DocumentRange, MonacoTokensProvider } from "../../engines/types";
-import { useEditorConfig } from "./use-editor-config";
-
-// Type aliases for the Monaco editor
-type EditorInstance = monaco.editor.IStandaloneCodeEditor;
-
-/** Create Monaco decoration range object from highlights */
-const createRange = (
-  monacoInstance: typeof monaco,
-  highlights: DocumentRange
-) => {
-  const lineNum = highlights.line;
-  const startChar = highlights.charRange?.start || 0;
-  const endChar = highlights.charRange?.end || 1000;
-  const range = new monacoInstance.Range(lineNum, startChar, lineNum, endChar);
-  const isWholeLine = !highlights.charRange;
-  return { range, options: { isWholeLine, inlineClassName: "code-highlight" } };
-};
+import { createHighlightRange, EditorInstance } from "./monaco-utils";
+import { useEditorBreakpoints } from "./use-editor-breakpoints";
 
 // Interface for interacting with the editor
 export interface CodeEditorRef {
@@ -37,6 +22,8 @@ type Props = {
   highlights?: DocumentRange;
   /** Tokens provider for the language */
   tokensProvider?: MonacoTokensProvider;
+  /** Callback to update debugging breakpoints */
+  onUpdateBreakpoints: (newBreakpoints: number[]) => void;
 };
 
 /**
@@ -47,7 +34,16 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const editorRef = React.useRef<EditorInstance | null>(null);
   const monacoInstance = useMonaco();
   const { highlights } = props;
-  useEditorConfig({
+
+  // Breakpoints
+  useEditorBreakpoints({
+    editor: editorRef.current,
+    monaco: monacoInstance,
+    onUpdateBreakpoints: props.onUpdateBreakpoints,
+  });
+
+  // Language config
+  useEditorLanguageConfig({
     languageId: props.languageId,
     tokensProvider: props.tokensProvider,
   });
@@ -55,7 +51,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   // Change editor highlights when prop changes
   React.useEffect(() => {
     if (!editorRef.current || !highlights) return;
-    const range = createRange(monacoInstance!, highlights);
+    const range = createHighlightRange(monacoInstance!, highlights);
     const decors = editorRef.current!.deltaDecorations([], [range]);
     return () => {
       editorRef.current!.deltaDecorations(decors, []);
@@ -77,7 +73,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
       defaultLanguage="brainfuck"
       defaultValue={props.defaultValue}
       onMount={(editor) => (editorRef.current = editor)}
-      options={{ minimap: { enabled: false } }}
+      options={{ minimap: { enabled: false }, glyphMargin: true }}
     />
   );
 };

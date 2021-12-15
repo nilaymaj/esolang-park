@@ -1,12 +1,19 @@
 .code-highlight {
-  background-color: #ffff0077;
+  background-color: #ffff00aa;
 }
 
 .breakpoint-glyph {
   box-sizing: border-box;
-  padding: 4%;
+  padding: 6%; /* Make the dot smaller in size */
+  margin-top: 2px; /* Fix dot appearing slightly above baseline */
   border-radius: 50%;
-  margin-left: 10px;
-  background-color: #ff5555;
   background-clip: content-box;
+}
+
+.breakpoint-glyph.solid {
+  background-color: #ff5555 !important;
+}
+
+.breakpoint-glyph.hint {
+  background-color: #ff555555;
 }

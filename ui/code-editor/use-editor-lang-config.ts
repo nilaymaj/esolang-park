@@ -8,7 +8,7 @@ type ConfigParams = {
 };
 
 /** Add custom language and relevant providers to Monaco */
-export const useEditorConfig = (params: ConfigParams) => {
+export const useEditorLanguageConfig = (params: ConfigParams) => {
   const monaco = useMonaco();
 
   React.useEffect(() => {
