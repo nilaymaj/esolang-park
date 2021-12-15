@@ -9,8 +9,9 @@ import {
 type WorkerState =
   | "loading" // Worker is not initialized yet
   | "empty" // Worker loaded, no code loaded yet
-  | "ready" // Code loaded, ready to execute
+  | "ready" // Ready to start execution
   | "processing" // Executing code
+  | "paused" // Execution currently paused
   | "done"; // Program ended, reset now
 
 /**
@@ -66,7 +67,7 @@ export const useExecController = <RS>() => {
     fnName: string,
     res: WorkerResponseData<RS>
   ): never => {
-    throw new Error(`Unexpected response on ${fnName}: ${res.toString()}`);
+    throw new Error(`Unexpected response on ${fnName}: ${JSON.stringify(res)}`);
   };
 
   // Initialization and cleanup of web worker
@@ -129,10 +130,21 @@ export const useExecController = <RS>() => {
   }, []);
 
   /**
+   * Pause program execution
+   */
+  const pauseExecution = React.useCallback(async () => {
+    await requestWorker({ type: "Pause" }, (res) => {
+      // We don't update state here - that's done by the execution stream instead
+      if (!(res.type === "ack" && res.data === "pause")) return true;
+      return false;
+    });
+  }, []);
+
+  /**
    * Execute the code loaded into the engine
    * @param onResult Callback used when an execution result is received
    */
-  const executeAll = React.useCallback(
+  const execute = React.useCallback(
     async (
       onResult: (result: StepExecutionResult<RS>) => void,
       interval?: number
@@ -142,10 +154,13 @@ export const useExecController = <RS>() => {
       await requestWorker({ type: "Execute", params: { interval } }, (res) => {
         if (res.type !== "result") return true;
         onResult(res.data);
-        if (res.data.nextStepLocation) return true;
-        // Clean up and terminate response stream
-        setWorkerState("done");
-        return false;
+        if (!res.data.nextStepLocation) {
+          setWorkerState("done");
+          return false;
+        } else if (res.data.signal === "paused") {
+          setWorkerState("paused");
+          return false;
+        } else return true;
       });
     },
     []
@@ -155,7 +170,8 @@ export const useExecController = <RS>() => {
     state: workerState,
     resetState,
     prepare,
-    executeAll,
+    pauseExecution,
+    execute,
     updateBreakpoints,
   };
 };

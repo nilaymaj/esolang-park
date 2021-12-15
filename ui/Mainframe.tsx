@@ -6,6 +6,7 @@ import { useExecController } from "../ui/use-exec-controller";
 import { DocumentRange, LanguageProvider } from "../engines/types";
 import BrainfuckProvider from "../engines/brainfuck";
 import { OutputViewer } from "../ui/output-viewer";
+import { ExecutionControls } from "./execution-controls";
 
 export const Mainframe = () => {
   const codeEditorRef = React.useRef<CodeEditorRef>(null);
@@ -20,18 +21,18 @@ export const Mainframe = () => {
     DocumentRange | undefined
   >();
 
-  const testDrive = React.useCallback(async () => {
-    console.info("=== RUNNING TEST DRIVE ===");
-
-    // Check that controller is ready to execute
-    const readyStates = ["empty", "ready", "done"];
+  /** Reset and begin a new execution */
+  const runProgram = async () => {
+    // Check if controller is free for execution
+    const readyStates = ["empty", "done"];
     if (!readyStates.includes(execController.state)) {
       console.error(`Controller not ready: state is ${execController.state}`);
       return;
     }
 
-    // Prepare for execution
+    // Reset any existing execution state
     setOutput("");
+    setRendererState(null);
     await execController.resetState();
     await execController.prepare(
       codeEditorRef.current!.getValue(),
@@ -39,21 +40,65 @@ export const Mainframe = () => {
     );
 
     // Begin execution
-    await execController.executeAll((result) => {
+    await execController.execute((result) => {
       setRendererState(result.rendererState);
       setCodeHighlights(result.nextStepLocation || undefined);
       setOutput((o) => (o || "") + (result.output || ""));
-    }, 20);
-  }, [execController.state]);
+    }, 1000);
+  };
 
-  React.useEffect(() => {
-    const handler = (ev: KeyboardEvent) => {
-      if (!(ev.ctrlKey && ev.code === "KeyY")) return;
-      testDrive();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [testDrive]);
+  /** Pause the ongoing execution */
+  const pauseExecution = async () => {
+    // Check if controller is indeed executing code
+    if (execController.state !== "processing") {
+      console.error("Controller not processing any code");
+      return;
+    }
+    await execController.pauseExecution();
+  };
+
+  /** Resume the currently paused execution */
+  const resumeExecution = async () => {
+    // Check if controller is indeed paused
+    if (execController.state !== "paused") {
+      console.error("Controller is not paused");
+      return;
+    }
+
+    // Begin execution
+    await execController.execute((result) => {
+      setRendererState(result.rendererState);
+      setCodeHighlights(result.nextStepLocation || undefined);
+      setOutput((o) => (o || "") + (result.output || ""));
+    }, 1000);
+  };
+
+  /** Stop the currently active execution */
+  const stopExecution = async () => {
+    // Check if controller has execution
+    if (!["paused", "processing"].includes(execController.state)) {
+      console.error("No active execution in controller");
+      return;
+    }
+
+    // If currently processing, pause execution loop first
+    if (execController.state === "processing")
+      await execController.pauseExecution();
+
+    // Reset all execution states
+    await execController.resetState();
+    setOutput(null);
+    setRendererState(null);
+    setCodeHighlights(undefined);
+  };
+
+  /** Translate execution controller state to debug controls state */
+  const getDebugState = () => {
+    const currState = execController.state;
+    if (currState === "processing") return "running";
+    else if (currState === "paused") return "paused";
+    else return "off";
+  };
 
   return (
     <MainLayout
@@ -74,6 +119,15 @@ export const Mainframe = () => {
       )}
       renderInput={() => <InputEditor ref={inputEditorRef} />}
       renderOutput={() => <OutputViewer value={output} />}
+      renderExecControls={() => (
+        <ExecutionControls
+          state={getDebugState()}
+          onRun={runProgram}
+          onPause={pauseExecution}
+          onResume={resumeExecution}
+          onStop={stopExecution}
+        />
+      )}
     />
   );
 };

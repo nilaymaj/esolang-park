@@ -71,11 +71,20 @@ const execute = (interval?: number) => {
   });
 };
 
-addEventListener("message", (ev: MessageEvent<WorkerRequestData>) => {
+/**
+ * Trigger pause in program execution
+ */
+const pauseExecution = async () => {
+  await _controller!.pauseExecution();
+  postMessage(ackMessage("pause"));
+};
+
+addEventListener("message", async (ev: MessageEvent<WorkerRequestData>) => {
   if (ev.data.type === "Init") return initController();
   if (ev.data.type === "Reset") return resetController();
   if (ev.data.type === "Prepare") return prepare(ev.data.params);
   if (ev.data.type === "Execute") return execute(ev.data.params.interval);
+  if (ev.data.type === "Pause") return await pauseExecution();
   if (ev.data.type === "UpdateBreakpoints")
     return updateBreakpoints(ev.data.params.points);
   throw new Error("Invalid worker message type");

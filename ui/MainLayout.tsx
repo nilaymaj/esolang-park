@@ -16,6 +16,7 @@ type Props = {
   renderRenderer: () => React.ReactNode;
   renderInput: () => React.ReactNode;
   renderOutput: () => React.ReactNode;
+  renderExecControls: () => React.ReactNode;
 };
 
 export const MainLayout = (props: Props) => {
@@ -48,7 +49,9 @@ export const MainLayout = (props: Props) => {
         <MosaicWindow<number>
           path={path}
           title={WindowTitles[windowId]}
-          toolbarControls={<span />}
+          toolbarControls={
+            windowId === "editor" ? props.renderExecControls() : <span />
+          }
         >
           {MOSAIC_MAP[windowId]()}
         </MosaicWindow>

@@ -35,6 +35,9 @@ export type StepExecutionResult<RS> = {
    * Passing `null` indicates reaching the end of program.
    */
   nextStepLocation: DocumentRange | null;
+
+  /** Signal if execution has been paused/stopped */
+  signal?: "paused";
 };
 
 /**

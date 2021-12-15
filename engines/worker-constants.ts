@@ -21,10 +21,19 @@ export type WorkerRequestData =
   | {
       type: "Execute";
       params: { interval?: number };
+    }
+  | {
+      type: "Pause";
+      params?: null;
     };
 
 /** Kinds of acknowledgement responses the worker can send  */
-export type WorkerAckType = "init" | "reset" | "bp-update" | "prepare";
+export type WorkerAckType =
+  | "init" // on initialization
+  | "reset" // on state reset
+  | "bp-update" // on updating breakpoints
+  | "prepare" // on preparing for execution
+  | "pause"; // on pausing execution
 
 /** Types of responses the worker can send */
 export type WorkerResponseData<RS> =
