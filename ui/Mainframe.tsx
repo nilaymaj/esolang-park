@@ -44,7 +44,7 @@ export const Mainframe = () => {
       setRendererState(result.rendererState);
       setCodeHighlights(result.nextStepLocation || undefined);
       setOutput((o) => (o || "") + (result.output || ""));
-    }, 1000);
+    }, 40);
   };
 
   /** Pause the ongoing execution */
@@ -70,7 +70,7 @@ export const Mainframe = () => {
       setRendererState(result.rendererState);
       setCodeHighlights(result.nextStepLocation || undefined);
       setOutput((o) => (o || "") + (result.output || ""));
-    }, 1000);
+    }, 40);
   };
 
   /** Stop the currently active execution */

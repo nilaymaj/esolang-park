@@ -97,25 +97,38 @@ class ExecutionController<RS> {
    * @returns Returns last (already used) execution result
    */
   async executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
+    // Clear paused state
+    this._isPaused = false;
+
     while (true) {
+      // Run an execution step in the engine
       this._result = this._engine.executeStep();
-      console.log("Result: ", this._result);
+
+      // Check end of program
       if (!this._result.nextStepLocation) {
-        // End of program
         onResult && onResult(this._result);
         this._resolvePause && this._resolvePause(); // In case pause happens on same cycle
         break;
-      } else if (this._resolvePause) {
-        // Execution has been paused/stopped
+      }
+
+      // Check if execution has been paused
+      if (this._resolvePause) {
         this._result.signal = "paused";
         onResult && onResult(this._result);
-        this._resolvePause();
+        this._resolvePause && this._resolvePause();
         break;
-      } else {
-        onResult && onResult(this._result);
-        // Sleep for specified interval
-        await this.sleep(interval || 0);
       }
+
+      // Check if next line has breakpoint
+      if (this._breakpoints.includes(this._result.nextStepLocation.line)) {
+        this._result.signal = "paused";
+        onResult && onResult(this._result);
+        break;
+      }
+
+      // Continue as usual
+      onResult && onResult(this._result);
+      await this.sleep(interval || 0);
     }
 
     return this._result;
