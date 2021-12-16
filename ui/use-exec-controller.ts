@@ -161,7 +161,7 @@ export const useExecController = <RS>() => {
   const execute = React.useCallback(
     async (
       onResult: (result: StepExecutionResult<RS>) => void,
-      interval?: number
+      interval: number
     ) => {
       setWorkerState("processing");
       // Set up a streaming-response cycle with the worker
