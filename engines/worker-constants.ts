@@ -20,7 +20,7 @@ export type WorkerRequestData =
     }
   | {
       type: "Execute";
-      params: { interval?: number };
+      params: { interval: number };
     }
   | {
       type: "ExecuteStep";

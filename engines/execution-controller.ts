@@ -2,12 +2,12 @@ import { LanguageEngine, StepExecutionResult } from "./types";
 
 type ExecuteAllArgs<RS> = {
   /** Interval between two execution steps, in milliseconds */
-  interval?: number;
+  interval: number;
   /**
    * Pass to run in streaming-response mode.
    * Callback is called with exeuction result on every execution step.
    */
-  onResult?: (result: StepExecutionResult<RS>) => void;
+  onResult: (result: StepExecutionResult<RS>) => void;
 };
 
 class ExecutionController<RS> {
@@ -15,6 +15,7 @@ class ExecutionController<RS> {
   private _breakpoints: number[] = [];
   private _result: StepExecutionResult<RS> | null;
   private _resolvePause: (() => void) | null = null;
+  private _execInterval: NodeJS.Timeout | null = null;
   private _isPaused: boolean = false;
 
   /**
@@ -94,44 +95,52 @@ class ExecutionController<RS> {
    * Execute the loaded program until stopped.
    * @param param0.interval Interval between two execution steps
    * @param param0.onResult Callback called with result on each execution step
-   * @returns Returns last (already used) execution result
    */
   async executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
     // Clear paused state
     this._isPaused = false;
+    console.log(interval);
 
-    while (true) {
-      // Run an execution step in the engine
-      this._result = this._engine.executeStep();
-
-      // Check end of program
-      if (!this._result.nextStepLocation) {
-        onResult && onResult(this._result);
-        this._resolvePause && this._resolvePause(); // In case pause happens on same cycle
-        break;
+    // Run execution loop using an Interval
+    this._execInterval = setInterval(() => {
+      const doBreak = this.runExecLoopIteration();
+      onResult(this._result!);
+      if (doBreak) {
+        clearInterval(this._execInterval!);
+        this._execInterval = null;
       }
+    }, interval);
+  }
 
-      // Check if execution has been paused
-      if (this._resolvePause) {
-        this._result.signal = "paused";
-        onResult && onResult(this._result);
-        this._resolvePause && this._resolvePause();
-        break;
-      }
+  /**
+   * Runs a single iteration of execution loop, and sets
+   * `this._result` to the execution result.
+   * @returns Boolean - if true, break execution loop.
+   */
+  private runExecLoopIteration(): boolean {
+    // Run an execution step in the engine
+    this._result = this._engine.executeStep();
 
-      // Check if next line has breakpoint
-      if (this._breakpoints.includes(this._result.nextStepLocation.line)) {
-        this._result.signal = "paused";
-        onResult && onResult(this._result);
-        break;
-      }
-
-      // Continue as usual
-      onResult && onResult(this._result);
-      await this.sleep(interval || 0);
+    // Check end of program
+    if (!this._result.nextStepLocation) {
+      this._resolvePause && this._resolvePause(); // In case pause happens on same cycle
+      return true;
     }
 
-    return this._result;
+    // Check if execution has been paused
+    if (this._resolvePause) {
+      this._result.signal = "paused";
+      this._resolvePause && this._resolvePause();
+      return true;
+    }
+
+    // Check if next line has breakpoint
+    if (this._breakpoints.includes(this._result.nextStepLocation!.line)) {
+      this._result.signal = "paused";
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -142,11 +151,6 @@ class ExecutionController<RS> {
     this._result = this._engine.executeStep();
     this._result.signal = "paused";
     return this._result;
-  }
-
-  /** Asynchronously sleep for a period of time */
-  private async sleep(millis: number) {
-    return new Promise<void>((resolve) => setTimeout(resolve, millis));
   }
 }
 

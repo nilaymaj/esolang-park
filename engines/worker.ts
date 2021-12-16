@@ -63,7 +63,7 @@ const updateBreakpoints = (points: number[]) => {
  * Execute the entire program loaded on engine,
  * and return result of execution.
  */
-const execute = (interval?: number) => {
+const execute = (interval: number) => {
   _controller!.executeAll({
     interval,
     onResult: (res) => postMessage(resultMessage(res)),
