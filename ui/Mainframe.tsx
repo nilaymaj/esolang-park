@@ -3,7 +3,11 @@ import { CodeEditor, CodeEditorRef } from "../ui/code-editor";
 import { InputEditor, InputEditorRef } from "../ui/input-editor";
 import { MainLayout } from "../ui/MainLayout";
 import { useExecController } from "../ui/use-exec-controller";
-import { DocumentRange, LanguageProvider } from "../engines/types";
+import {
+  DocumentRange,
+  LanguageProvider,
+  StepExecutionResult,
+} from "../engines/types";
 import BrainfuckProvider from "../engines/brainfuck";
 import { OutputViewer } from "../ui/output-viewer";
 import { ExecutionControls } from "./execution-controls";
@@ -15,11 +19,19 @@ export const Mainframe = () => {
   const execController = useExecController();
 
   // UI states used in execution time
+  const [execInterval, setExecInterval] = React.useState(20);
   const [rendererState, setRendererState] = React.useState<any>(null);
   const [output, setOutput] = React.useState<string | null>(null);
   const [codeHighlights, setCodeHighlights] = React.useState<
     DocumentRange | undefined
   >();
+
+  /** Utility that updates UI with the provided execution result */
+  const updateWithResult = (result: StepExecutionResult<any>) => {
+    setRendererState(result.rendererState);
+    setCodeHighlights(result.nextStepLocation || undefined);
+    setOutput((o) => (o || "") + (result.output || ""));
+  };
 
   /** Reset and begin a new execution */
   const runProgram = async () => {
@@ -40,11 +52,7 @@ export const Mainframe = () => {
     );
 
     // Begin execution
-    await execController.execute((result) => {
-      setRendererState(result.rendererState);
-      setCodeHighlights(result.nextStepLocation || undefined);
-      setOutput((o) => (o || "") + (result.output || ""));
-    }, 40);
+    await execController.execute(updateWithResult, execInterval);
   };
 
   /** Pause the ongoing execution */
@@ -67,9 +75,7 @@ export const Mainframe = () => {
 
     // Run and update execution states
     const result = await execController.executeStep();
-    setRendererState(result.rendererState);
-    setCodeHighlights(result.nextStepLocation || undefined);
-    setOutput((o) => (o || "") + (result.output || ""));
+    updateWithResult(result);
   };
 
   /** Resume the currently paused execution */
@@ -81,11 +87,7 @@ export const Mainframe = () => {
     }
 
     // Begin execution
-    await execController.execute((result) => {
-      setRendererState(result.rendererState);
-      setCodeHighlights(result.nextStepLocation || undefined);
-      setOutput((o) => (o || "") + (result.output || ""));
-    }, 40);
+    await execController.execute(updateWithResult, execInterval);
   };
 
   /** Stop the currently active execution */
@@ -142,6 +144,7 @@ export const Mainframe = () => {
           onResume={resumeExecution}
           onStep={executeStep}
           onStop={stopExecution}
+          onChangeInterval={setExecInterval}
         />
       )}
     />

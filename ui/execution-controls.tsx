@@ -1,11 +1,52 @@
-import { Button, ButtonGroup, Icon } from "@blueprintjs/core";
+import {
+  Button,
+  ButtonGroup,
+  Icon,
+  NumericInput,
+  Tag,
+} from "@blueprintjs/core";
 
 const styles = {
   container: {
     display: "flex",
     alignItems: "center",
     paddingRight: 5,
+    marginRight: -15,
   },
+  inputWrapper: {
+    /**
+     * As of Dec'21, NumericInput doesn't have `small` prop yet,
+     * so we instead use `transform` to hack up a smaller input.
+     */
+    transform: "scale(0.8)",
+  },
+  input: {
+    width: 125,
+  },
+};
+
+/** Input field for changing execution interval */
+const IntervalInput = (props: {
+  disabled: boolean;
+  onChange: (v: number) => void;
+}) => {
+  return (
+    <div style={styles.inputWrapper}>
+      <NumericInput
+        min={20}
+        defaultValue={20}
+        stepSize={10}
+        minorStepSize={null}
+        leftIcon="time"
+        clampValueOnBlur
+        style={styles.input}
+        disabled={props.disabled}
+        onValueChange={(v) => props.onChange(v)}
+        rightElement={<Tag minimal>ms</Tag>}
+        allowNumericCharactersOnly
+      />
+    </div>
+  );
 };
 
 /** Button for starting code execution */
@@ -59,6 +100,7 @@ type Props = {
   onResume: () => void;
   onStep: () => void;
   onStop: () => void;
+  onChangeInterval: (value: number) => void;
 };
 
 export const ExecutionControls = (props: Props) => {
@@ -75,6 +117,10 @@ export const ExecutionControls = (props: Props) => {
           onStop={props.onStop}
         />
       )}
+      <IntervalInput
+        disabled={props.state === "running"}
+        onChange={props.onChangeInterval}
+      />
     </div>
   );
 };
