@@ -1,6 +1,12 @@
+import { Card, Colors } from "@blueprintjs/core";
 import { CSSProperties } from "react";
+import { useDarkMode } from "../../ui/providers/dark-mode-provider";
 import { RendererProps } from "../types";
 import { BFRS } from "./constants";
+
+// Colors used as background of active cells
+const darkActiveBG = Colors.DARK_GRAY2;
+const lightActiveBG = Colors.LIGHT_GRAY3;
 
 const styles: { [k: string]: CSSProperties } = {
   container: {
@@ -16,16 +22,10 @@ const styles: { [k: string]: CSSProperties } = {
     width: "12%",
     height: "50px",
     margin: "5px 0.25%",
-    padding: 12,
     // Center-align values
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // Border and colors
-    border: "1px solid gray",
-    borderRadius: 5,
-    background: "#394B59",
-    color: "#E1E8ED",
   },
   activeCell: {
     background: "#CED9E0",
@@ -35,8 +35,14 @@ const styles: { [k: string]: CSSProperties } = {
 
 /** Component for displaying a single tape cell */
 const Cell = ({ value, active }: { value: number; active: boolean }) => {
-  const cellStyle = { ...styles.cell, ...(active ? styles.activeCell : {}) };
-  return <div style={cellStyle}>{value}</div>;
+  const { isDark } = useDarkMode();
+  const cellStyle = { ...styles.cell };
+  const activeBg = isDark ? darkActiveBG : lightActiveBG;
+  if (active) {
+    cellStyle.backgroundColor = activeBg;
+    cellStyle.fontWeight = "bold";
+  }
+  return <Card style={cellStyle}>{value}</Card>;
 };
 
 /** Renderer for Brainfuck */
