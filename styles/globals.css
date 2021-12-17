@@ -13,14 +13,6 @@ body,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-body {
-  background-color: #a7b6c2;
-}
-
-body.bp3-dark {
-  background-color: #202b33;
-}
-
 a {
   color: inherit;
   text-decoration: none;

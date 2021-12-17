@@ -1,10 +1,10 @@
-import { Classes } from "@blueprintjs/core";
 import React from "react";
+import { Colors } from "@blueprintjs/core";
 
 const DarkModeContext = React.createContext<{
   isDark: boolean;
   toggleDark: () => void;
-}>({ isDark: false, toggleDark: () => {} });
+}>({ isDark: true, toggleDark: () => {} });
 
 /** Context provider for managing dark mode state */
 export const DarkModeProvider = ({
@@ -12,16 +12,21 @@ export const DarkModeProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isDark, setIsDark] = React.useState(false);
-
-  const toggleDark = () => {
-    document.body.classList.toggle(Classes.DARK);
-    setIsDark((d) => !d);
-  };
+  const [isDark, setIsDark] = React.useState(true);
 
   return (
-    <DarkModeContext.Provider value={{ isDark, toggleDark }}>
-      {children}
+    <DarkModeContext.Provider
+      value={{ isDark, toggleDark: () => setIsDark((d) => !d) }}
+    >
+      <div
+        style={{
+          height: "100%",
+          backgroundColor: isDark ? Colors.DARK_GRAY2 : Colors.GRAY4,
+        }}
+        className={isDark ? "bp3-dark" : ""}
+      >
+        {children}
+      </div>
     </DarkModeContext.Provider>
   );
 };
