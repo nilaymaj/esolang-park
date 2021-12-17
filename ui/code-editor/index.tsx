@@ -1,8 +1,12 @@
 import React from "react";
-import Editor, { useMonaco } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
 import { useEditorLanguageConfig } from "./use-editor-lang-config";
 import { DocumentRange, MonacoTokensProvider } from "../../engines/types";
-import { createHighlightRange, EditorInstance } from "./monaco-utils";
+import {
+  createHighlightRange,
+  EditorInstance,
+  MonacoInstance,
+} from "./monaco-utils";
 import { useEditorBreakpoints } from "./use-editor-breakpoints";
 
 // Interface for interacting with the editor
@@ -30,13 +34,13 @@ type Props = {
  */
 const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const editorRef = React.useRef<EditorInstance | null>(null);
+  const monacoRef = React.useRef<MonacoInstance | null>(null);
   const highlightRange = React.useRef<string[]>([]);
-  const monacoInstance = useMonaco();
 
   // Breakpoints
   useEditorBreakpoints({
     editor: editorRef.current,
-    monaco: monacoInstance,
+    monaco: monacoRef.current,
     onUpdateBreakpoints: props.onUpdateBreakpoints,
   });
 
@@ -47,20 +51,17 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   });
 
   /** Update code highlights */
-  const updateHighlights = React.useCallback(
-    (hl: DocumentRange | null) => {
-      // Remove previous highlights
-      const prevRange = highlightRange.current;
-      editorRef.current!.deltaDecorations(prevRange, []);
+  const updateHighlights = React.useCallback((hl: DocumentRange | null) => {
+    // Remove previous highlights
+    const prevRange = highlightRange.current;
+    editorRef.current!.deltaDecorations(prevRange, []);
 
-      // Add new highlights
-      if (!hl) return;
-      const newRange = createHighlightRange(monacoInstance!, hl);
-      const rangeStr = editorRef.current!.deltaDecorations([], [newRange]);
-      highlightRange.current = rangeStr;
-    },
-    [monacoInstance]
-  );
+    // Add new highlights
+    if (!hl) return;
+    const newRange = createHighlightRange(monacoRef.current!, hl);
+    const rangeStr = editorRef.current!.deltaDecorations([], [newRange]);
+    highlightRange.current = rangeStr;
+  }, []);
 
   // Provide handle to parent for accessing editor contents
   React.useImperativeHandle(
@@ -77,7 +78,11 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
       theme="vs-dark"
       defaultLanguage="brainfuck"
       defaultValue={props.defaultValue}
-      onMount={(editor) => (editorRef.current = editor)}
+      onMount={(editor, monaco) => {
+        if (!editor || !monaco) throw new Error("Error in initializing editor");
+        editorRef.current = editor;
+        monacoRef.current = monaco;
+      }}
       options={{ minimap: { enabled: false }, glyphMargin: true }}
     />
   );

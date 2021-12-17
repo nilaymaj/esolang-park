@@ -103,7 +103,7 @@ export const useEditorBreakpoints = ({
   // Mouse leaves editor -> remove hover breakpoint hint
   React.useEffect(() => {
     if (!editor) return;
-    const disposer = editor.onMouseLeave((e: MonacoMouseLeaveEvent) => {
+    const disposer = editor.onMouseLeave((_: MonacoMouseLeaveEvent) => {
       if (!hoverBreakpoint.current) return;
       editor.deltaDecorations(hoverBreakpoint.current.decorRanges, []);
       hoverBreakpoint.current = null;
