@@ -92,6 +92,16 @@ class ExecutionController<RS> {
   }
 
   /**
+   * Run a single step of execution
+   * @returns Result of execution
+   */
+  executeStep(): StepExecutionResult<RS> {
+    this._result = this._engine.executeStep();
+    this._result.signal = "paused";
+    return this._result;
+  }
+
+  /**
    * Execute the loaded program until stopped.
    * @param param0.interval Interval between two execution steps
    * @param param0.onResult Callback called with result on each execution step
@@ -99,7 +109,6 @@ class ExecutionController<RS> {
   async executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
     // Clear paused state
     this._isPaused = false;
-    console.log(interval);
 
     // Run execution loop using an Interval
     this._execInterval = setInterval(() => {
@@ -141,16 +150,6 @@ class ExecutionController<RS> {
     }
 
     return false;
-  }
-
-  /**
-   * Run a single step of execution
-   * @returns Result of execution
-   */
-  executeStep(): StepExecutionResult<RS> {
-    this._result = this._engine.executeStep();
-    this._result.signal = "paused";
-    return this._result;
   }
 }
 
