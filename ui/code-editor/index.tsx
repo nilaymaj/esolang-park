@@ -8,6 +8,9 @@ import {
   MonacoInstance,
 } from "./monaco-utils";
 import { useEditorBreakpoints } from "./use-editor-breakpoints";
+import darkTheme from "./themes/dark.json";
+import lightTheme from "./themes/light.json";
+import { useDarkMode } from "../providers/dark-mode-provider";
 
 // Interface for interacting with the editor
 export interface CodeEditorRef {
@@ -36,6 +39,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const editorRef = React.useRef<EditorInstance | null>(null);
   const monacoRef = React.useRef<MonacoInstance | null>(null);
   const highlightRange = React.useRef<string[]>([]);
+  const { isDark } = useDarkMode();
 
   // Breakpoints
   useEditorBreakpoints({
@@ -75,9 +79,13 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
 
   return (
     <Editor
-      theme="vs-dark"
+      theme={isDark ? "ep-dark" : "ep-light"}
       defaultLanguage="brainfuck"
       defaultValue={props.defaultValue}
+      beforeMount={(monaco) => {
+        monaco.editor.defineTheme("ep-dark", darkTheme as any);
+        monaco.editor.defineTheme("ep-light", lightTheme as any);
+      }}
       onMount={(editor, monaco) => {
         if (!editor || !monaco) throw new Error("Error in initializing editor");
         editorRef.current = editor;

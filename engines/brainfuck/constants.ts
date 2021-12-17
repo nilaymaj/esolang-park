@@ -71,10 +71,10 @@ export const sampleProgram = [
 export const editorTokensProvider: MonacoTokensProvider = {
   tokenizer: {
     root: [
-      [/[-\+]/, "operator"],
-      [/[<>]/, "annotation"],
-      [/[\[\]]/, "keyword"],
-      [/[\,\.]/, "type.identifier"],
+      [/[-\+]/, "plain"],
+      [/[<>]/, "green"],
+      [/[\[\]]/, "violet"],
+      [/[\,\.]/, "orange"],
     ],
   },
   defaultToken: "comment",
