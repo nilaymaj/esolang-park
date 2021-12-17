@@ -3,34 +3,39 @@ import { CodeEditor, CodeEditorRef } from "../ui/code-editor";
 import { InputEditor, InputEditorRef } from "../ui/input-editor";
 import { MainLayout } from "../ui/MainLayout";
 import { useExecController } from "../ui/use-exec-controller";
-import {
-  DocumentRange,
-  LanguageProvider,
-  StepExecutionResult,
-} from "../engines/types";
+import { LanguageProvider, StepExecutionResult } from "../engines/types";
 import BrainfuckProvider from "../engines/brainfuck";
-import { OutputViewer } from "../ui/output-viewer";
+import { OutputViewer, OutputViewerRef } from "../ui/output-viewer";
 import { ExecutionControls } from "./execution-controls";
+import { RendererRef, RendererWrapper } from "./renderer-wrapper";
 
+/**
+ * React component that contains and controls the entire IDE.
+ *
+ * For performance reasons, Mainframe makes spare use of state hooks. This
+ * component is rather expensive to render, and will block the main thread on
+ * small execution intervals if rendered on every execution. All state management
+ * is delegated to imperatively controlled child components.
+ */
 export const Mainframe = () => {
-  const codeEditorRef = React.useRef<CodeEditorRef>(null);
-  const inputEditorRef = React.useRef<InputEditorRef>(null);
+  // Language provider and engine
   const providerRef = React.useRef<LanguageProvider<any>>(BrainfuckProvider);
   const execController = useExecController();
 
-  // UI states used in execution time
+  // Refs for controlling UI components
+  const codeEditorRef = React.useRef<CodeEditorRef>(null);
+  const inputEditorRef = React.useRef<InputEditorRef>(null);
+  const outputEditorRef = React.useRef<OutputViewerRef>(null);
+  const rendererRef = React.useRef<RendererRef<any>>(null);
+
+  // Interval of execution
   const [execInterval, setExecInterval] = React.useState(20);
-  const [rendererState, setRendererState] = React.useState<any>(null);
-  const [output, setOutput] = React.useState<string | null>(null);
-  const [codeHighlights, setCodeHighlights] = React.useState<
-    DocumentRange | undefined
-  >();
 
   /** Utility that updates UI with the provided execution result */
   const updateWithResult = (result: StepExecutionResult<any>) => {
-    setRendererState(result.rendererState);
-    setCodeHighlights(result.nextStepLocation || undefined);
-    setOutput((o) => (o || "") + (result.output || ""));
+    rendererRef.current!.updateState(result.rendererState);
+    codeEditorRef.current!.updateHighlights(result.nextStepLocation);
+    outputEditorRef.current!.append(result.output);
   };
 
   /** Reset and begin a new execution */
@@ -43,8 +48,7 @@ export const Mainframe = () => {
     }
 
     // Reset any existing execution state
-    setOutput("");
-    setRendererState(null);
+    outputEditorRef.current!.reset();
     await execController.resetState();
     await execController.prepare(
       codeEditorRef.current!.getValue(),
@@ -104,9 +108,9 @@ export const Mainframe = () => {
 
     // Reset all execution states
     await execController.resetState();
-    setOutput(null);
-    setRendererState(null);
-    setCodeHighlights(undefined);
+    outputEditorRef.current!.reset();
+    rendererRef.current!.updateState(null);
+    codeEditorRef.current!.updateHighlights(null);
   };
 
   /** Translate execution controller state to debug controls state */
@@ -123,7 +127,6 @@ export const Mainframe = () => {
         <CodeEditor
           ref={codeEditorRef}
           languageId="brainfuck"
-          highlights={codeHighlights}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
           onUpdateBreakpoints={(newPoints) =>
@@ -132,10 +135,13 @@ export const Mainframe = () => {
         />
       )}
       renderRenderer={() => (
-        <providerRef.current.Renderer state={rendererState} />
+        <RendererWrapper
+          ref={rendererRef}
+          renderer={providerRef.current.Renderer}
+        />
       )}
       renderInput={() => <InputEditor ref={inputEditorRef} />}
-      renderOutput={() => <OutputViewer value={output} />}
+      renderOutput={() => <OutputViewer ref={outputEditorRef} />}
       renderExecControls={() => (
         <ExecutionControls
           state={getDebugState()}

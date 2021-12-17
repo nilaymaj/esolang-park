@@ -1,3 +1,4 @@
+import React from "react";
 import { TextArea } from "@blueprintjs/core";
 
 /**
@@ -14,11 +15,21 @@ const toTextareaValue = (value: string | null): string | undefined => {
   return value; // Non-empty output value
 };
 
-type Props = {
-  value: string | null;
-};
+export interface OutputViewerRef {
+  /** Reset output to show placeholder text */
+  reset: () => void;
+  /** Append string to the displayed output */
+  append: (str?: string) => void;
+}
 
-export const OutputViewer = ({ value }: Props) => {
+const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
+  const [value, setValue] = React.useState<string | null>(null);
+
+  React.useImperativeHandle(ref, () => ({
+    reset: () => setValue(null),
+    append: (s) => setValue((o) => (o || "") + (s || "")),
+  }));
+
   return (
     <TextArea
       fill
@@ -31,3 +42,5 @@ export const OutputViewer = ({ value }: Props) => {
     />
   );
 };
+
+export const OutputViewer = React.forwardRef(OutputViewerComponent);

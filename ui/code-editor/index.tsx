@@ -7,10 +7,10 @@ import { useEditorBreakpoints } from "./use-editor-breakpoints";
 
 // Interface for interacting with the editor
 export interface CodeEditorRef {
-  /**
-   * Get the current text content of the editor.
-   */
+  /** Get the current text content of the editor */
   getValue: () => string;
+  /** Update code highlights */
+  updateHighlights: (highlights: DocumentRange | null) => void;
 }
 
 type Props = {
@@ -18,8 +18,6 @@ type Props = {
   languageId: string;
   /** Default code to display in editor */
   defaultValue: string;
-  /** Code range to highlight in the editor */
-  highlights?: DocumentRange;
   /** Tokens provider for the language */
   tokensProvider?: MonacoTokensProvider;
   /** Callback to update debugging breakpoints */
@@ -32,8 +30,8 @@ type Props = {
  */
 const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const editorRef = React.useRef<EditorInstance | null>(null);
+  const highlightRange = React.useRef<string[]>([]);
   const monacoInstance = useMonaco();
-  const { highlights } = props;
 
   // Breakpoints
   useEditorBreakpoints({
@@ -48,21 +46,28 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
     tokensProvider: props.tokensProvider,
   });
 
-  // Change editor highlights when prop changes
-  React.useEffect(() => {
-    if (!editorRef.current || !highlights) return;
-    const range = createHighlightRange(monacoInstance!, highlights);
-    const decors = editorRef.current!.deltaDecorations([], [range]);
-    return () => {
-      editorRef.current!.deltaDecorations(decors, []);
-    };
-  }, [highlights]);
+  /** Update code highlights */
+  const updateHighlights = React.useCallback(
+    (hl: DocumentRange | null) => {
+      // Remove previous highlights
+      const prevRange = highlightRange.current;
+      editorRef.current!.deltaDecorations(prevRange, []);
+
+      // Add new highlights
+      if (!hl) return;
+      const newRange = createHighlightRange(monacoInstance!, hl);
+      const rangeStr = editorRef.current!.deltaDecorations([], [newRange]);
+      highlightRange.current = rangeStr;
+    },
+    [monacoInstance]
+  );
 
   // Provide handle to parent for accessing editor contents
   React.useImperativeHandle(
     ref,
     () => ({
       getValue: () => editorRef.current!.getValue(),
+      updateHighlights,
     }),
     []
   );
