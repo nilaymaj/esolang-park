@@ -1,5 +1,6 @@
 import React from "react";
 import { Mosaic, MosaicNode, MosaicWindow } from "react-mosaic-component";
+import { useDarkMode } from "./providers/dark-mode-provider";
 
 // IDs of windows in the mosaic layout
 type WINDOW_ID = "editor" | "renderer" | "input" | "output";
@@ -20,6 +21,9 @@ type Props = {
 };
 
 export const MainLayout = (props: Props) => {
+  const { isDark } = useDarkMode();
+  const mosaicClass = "mosaic-blueprint-theme" + (isDark ? " bp3-dark" : "");
+
   const MOSAIC_MAP = {
     editor: props.renderEditor,
     renderer: props.renderRenderer,
@@ -43,7 +47,7 @@ export const MainLayout = (props: Props) => {
 
   return (
     <Mosaic<keyof typeof MOSAIC_MAP>
-      className="mosaic-blueprint-theme bp3-dark"
+      className={mosaicClass}
       initialValue={INITIAL_LAYOUT}
       renderTile={(windowId, path) => (
         <MosaicWindow<number>
