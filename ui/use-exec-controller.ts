@@ -21,7 +21,7 @@ type WorkerState =
  * Also abstracts away the details of message-passing and exposes
  * an imperative API to the parent component.
  */
-export const useExecController = <RS>() => {
+export const useExecController = <RS>(langName: string) => {
   const workerRef = React.useRef<Worker | null>(null);
   const [workerState, setWorkerState] = React.useState<WorkerState>("loading");
 
@@ -74,9 +74,7 @@ export const useExecController = <RS>() => {
   React.useEffect(() => {
     (async () => {
       if (workerRef.current) throw new Error("Tried to reinitialize worker");
-      workerRef.current = new Worker(
-        new URL("../engines/worker.ts", import.meta.url)
-      );
+      workerRef.current = new Worker(`../workers/${langName}.js`);
       const res = await requestWorker({ type: "Init" });
       if (res.type === "ack" && res.data === "init") setWorkerState("empty");
       else throwUnexpectedRes("init", res);

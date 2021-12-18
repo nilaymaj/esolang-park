@@ -1,3 +1,4 @@
+import { setupWorker } from "../setup-worker";
 import { DocumentRange, LanguageEngine, StepExecutionResult } from "../types";
 import { BFAstStep, BFInstruction, BFRS, BF_OP } from "./constants";
 
@@ -178,4 +179,4 @@ class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
   }
 }
 
-export default BrainfuckLanguageEngine;
+setupWorker(new BrainfuckLanguageEngine());

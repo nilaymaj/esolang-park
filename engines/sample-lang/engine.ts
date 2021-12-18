@@ -1,3 +1,4 @@
+import { setupWorker } from "../setup-worker";
 import { LanguageEngine, StepExecutionResult } from "../types";
 import { RS } from "./constants";
 
@@ -120,4 +121,4 @@ class SampleLanguageEngine implements LanguageEngine<RS> {
   };
 }
 
-export default SampleLanguageEngine;
+setupWorker(new SampleLanguageEngine());

@@ -4,10 +4,14 @@ import { InputEditor, InputEditorRef } from "../ui/input-editor";
 import { MainLayout } from "../ui/MainLayout";
 import { useExecController } from "../ui/use-exec-controller";
 import { LanguageProvider, StepExecutionResult } from "../engines/types";
-import BrainfuckProvider from "../engines/brainfuck";
 import { OutputViewer, OutputViewerRef } from "../ui/output-viewer";
 import { ExecutionControls } from "./execution-controls";
 import { RendererRef, RendererWrapper } from "./renderer-wrapper";
+
+type Props<RS> = {
+  langName: string;
+  provider: LanguageProvider<RS>;
+};
 
 /**
  * React component that contains and controls the entire IDE.
@@ -17,10 +21,10 @@ import { RendererRef, RendererWrapper } from "./renderer-wrapper";
  * small execution intervals if rendered on every execution. All state management
  * is delegated to imperatively controlled child components.
  */
-export const Mainframe = () => {
+export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
   // Language provider and engine
-  const providerRef = React.useRef<LanguageProvider<any>>(BrainfuckProvider);
-  const execController = useExecController();
+  const providerRef = React.useRef(provider);
+  const execController = useExecController(langName);
 
   // Refs for controlling UI components
   const codeEditorRef = React.useRef<CodeEditorRef>(null);
@@ -137,7 +141,7 @@ export const Mainframe = () => {
       renderRenderer={() => (
         <RendererWrapper
           ref={rendererRef}
-          renderer={providerRef.current.Renderer}
+          renderer={providerRef.current.Renderer as any}
         />
       )}
       renderInput={() => <InputEditor ref={inputEditorRef} />}

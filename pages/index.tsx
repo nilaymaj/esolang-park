@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import { Mainframe } from "../ui/Mainframe";
 import Head from "next/head";
 import { Header } from "../ui/header";
+import BrainfuckProvider from "../engines/brainfuck";
 
 const Index: NextPage = () => {
   return (
@@ -13,7 +14,7 @@ const Index: NextPage = () => {
       <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <Header />
         <div style={{ flexGrow: 1 }}>
-          <Mainframe />
+          <Mainframe langName="brainfuck" provider={BrainfuckProvider} />
         </div>
       </div>
     </>
