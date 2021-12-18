@@ -3,9 +3,9 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import { Header } from "../../ui/header";
-import LangProvider from "../../engines/sample-lang";
-const LANG_ID = "sample-lang";
-const LANG_NAME = "Sample";
+import LangProvider from "../../engines/deadfish";
+const LANG_ID = "deadfish";
+const LANG_NAME = "Deadfish";
 
 const IDE: NextPage = () => {
   return (

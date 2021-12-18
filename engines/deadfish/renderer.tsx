@@ -1,5 +1,5 @@
 import { RendererProps } from "../types";
-import { RS } from "./constants";
+import { DFRS } from "./constants";
 
 const styles = {
   container: {
@@ -14,7 +14,7 @@ const styles = {
   },
 };
 
-export const Renderer = ({ state }: RendererProps<RS>) => {
+export const Renderer = ({ state }: RendererProps<DFRS>) => {
   const value = state == null ? 0 : state.value;
   return (
     <div style={styles.container}>
