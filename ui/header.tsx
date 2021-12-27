@@ -2,7 +2,7 @@ import { Button, Card, Icon } from "@blueprintjs/core";
 import { GitHubIcon } from "./custom-icons";
 import { useDarkMode } from "./providers/dark-mode-provider";
 
-export const Header = () => {
+export const Header = ({ langName }: { langName: string }) => {
   const DarkMode = useDarkMode();
 
   const brandSection = (
@@ -14,7 +14,7 @@ export const Header = () => {
   );
 
   const langSection = (
-    <div style={{ flex: 0, textAlign: "center" }}>Brainfuck</div>
+    <div style={{ flex: 0, textAlign: "center" }}>{langName}</div>
   );
 
   const infoSection = (
