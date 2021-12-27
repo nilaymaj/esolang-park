@@ -21,10 +21,14 @@ export const Header = ({ langName }: { langName: string }) => {
     <div style={{ flex: 1, textAlign: "right", paddingRight: 8 }}>
       <Button
         minimal
-        icon={<Icon icon="moon" />}
+        title="Toggle between dark and light mode"
+        icon={<Icon icon={DarkMode.isDark ? "flash" : "moon"} />}
         onClick={DarkMode.toggleDark}
       />
-      <a href="https://github.com/nilaymaj/esolang-park">
+      <a
+        href="https://github.com/nilaymaj/esolang-park"
+        title="GitHub repository"
+      >
         <Button minimal icon={<Icon icon={<GitHubIcon />} />} />
       </a>
     </div>
