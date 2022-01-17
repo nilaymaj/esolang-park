@@ -1,0 +1,44 @@
+Fibonacci Du Fromage.
+
+==== Source: https://github.com/joostrijneveld/Chef-Interpreter/blob/master/ChefInterpreter/FibonacciDuFromage ====
+An improvement on the Fibonacci with Caramel Sauce recipe. Much less for the sweettooths, much more correct.
+
+Ingredients.
+5 g numbers
+1 g cheese
+
+Method.
+Take numbers from refrigerator.
+Put cheese into mixing bowl.
+Put cheese into mixing bowl.
+Put numbers into 2nd mixing bowl.
+Remove cheese from 2nd mixing bowl.
+Remove cheese from 2nd mixing bowl.
+Fold numbers into 2nd mixing bowl.
+Put numbers into 2nd mixing bowl.
+Calculate the numbers.
+Serve with salt and pepper.
+Ponder the numbers until calculate.
+Add cheese to 2nd mixing bowl.
+Add cheese to 2nd mixing bowl.
+Fold numbers into 2nd mixing bowl.
+Move the numbers.
+Fold cheese into mixing bowl.
+Put cheese into 2nd mixing bowl.
+Transfer the numbers until move.
+Pour contents of the 2nd mixing bowl into the baking dish.
+
+Serves 1.
+
+salt and pepper.
+
+Ingredients.
+1 g salt
+1 g pepper
+
+Method.
+Fold salt into mixing bowl.
+Fold pepper into mixing bowl.
+Clean mixing bowl.
+Put salt into mixing bowl.
+Add pepper.
