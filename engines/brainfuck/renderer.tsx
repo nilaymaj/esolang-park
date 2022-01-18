@@ -2,7 +2,7 @@ import { Card, Colors } from "@blueprintjs/core";
 import { CSSProperties } from "react";
 import { useDarkMode } from "../../ui/providers/dark-mode-provider";
 import { RendererProps } from "../types";
-import { BFRS } from "./constants";
+import { BFRS, serializeTapeMap } from "./common";
 
 // Colors used as background of active cells
 const darkActiveBG = Colors.DARK_GRAY2;
@@ -47,18 +47,9 @@ const Cell = ({ value, active }: { value: number; active: boolean }) => {
 
 /** Renderer for Brainfuck */
 export const Renderer = ({ state }: RendererProps<BFRS>) => {
-  /** Serialize tape from object format into linear array */
-  const serializeTapeObj = (tape: BFRS["tape"]) => {
-    const cellIdxs = Object.keys(tape).map((s) => parseInt(s, 10));
-    const maxCellIdx = Math.max(15, ...cellIdxs);
-    const linearTape = Array(maxCellIdx + 1).fill(0);
-    cellIdxs.forEach((i) => (linearTape[i] = tape[i] || 0));
-    return linearTape;
-  };
-
   return (
     <div style={styles.container}>
-      {serializeTapeObj(state?.tape || {}).map((num, i) => (
+      {serializeTapeMap(state?.tape || {}).map((num, i) => (
         <Cell value={num} key={i} active={(state?.pointer || 0) === i} />
       ))}
     </div>
