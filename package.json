@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "jest",
     "dev:worker": "webpack -c worker-pack/webpack.dev.js --watch",
     "build:worker": "webpack -c worker-pack/webpack.prod.js"
   },
@@ -19,10 +20,12 @@
     "react-mosaic-component": "^5.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
     "@types/node": "16.11.11",
     "@types/react": "17.0.37",
     "eslint": "8.4.0",
     "eslint-config-next": "12.0.7",
+    "jest": "^27.4.7",
     "ts-loader": "^9.2.6",
     "typescript": "4.5.2",
     "webpack": "^5.65.0",

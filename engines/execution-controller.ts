@@ -106,7 +106,7 @@ class ExecutionController<RS> {
    * @param param0.interval Interval between two execution steps
    * @param param0.onResult Callback called with result on each execution step
    */
-  async executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
+  executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
     // Clear paused state
     this._isPaused = false;
 
