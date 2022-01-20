@@ -21,11 +21,12 @@ export const createHighlightRange = (
   monacoInstance: MonacoInstance,
   highlights: DocumentRange
 ): MonacoDecoration => {
-  const lineNum = highlights.line;
-  const startChar = highlights.charRange?.start || 0;
-  const endChar = highlights.charRange?.end || 1000;
+  const location = get1IndexedLocation(highlights);
+  const lineNum = location.line;
+  const startChar = location.charRange?.start || 0;
+  const endChar = location.charRange?.end || 1e5;
   const range = new monacoInstance.Range(lineNum, startChar, lineNum, endChar);
-  const isWholeLine = !highlights.charRange;
+  const isWholeLine = !location.charRange;
   return { range, options: { isWholeLine, inlineClassName: "code-highlight" } };
 };
 
@@ -38,4 +39,21 @@ export const createBreakpointRange = (
   const range = new monacoInstance.Range(lineNum, 0, lineNum, 1000);
   const className = "breakpoint-glyph " + (hint ? "hint" : "solid");
   return { range, options: { glyphMarginClassName: className } };
+};
+
+/**
+ * Convert a DocumentRange to use 1-indexed values. Used since language engines
+ * use 0-indexed ranges but Monaco requires 1-indexed ranges.
+ * @param range DocumentRange to convert to 1-indexed
+ * @returns DocumentRange that uses 1-indexed values
+ */
+const get1IndexedLocation = (range: DocumentRange): DocumentRange => {
+  const lineNum = range.line + 1;
+  const charRange = range.charRange
+    ? {
+        start: range.charRange.start ? range.charRange.start + 1 : undefined,
+        end: range.charRange.end ? range.charRange.end + 1 : undefined,
+      }
+    : undefined;
+  return { line: lineNum, charRange };
 };

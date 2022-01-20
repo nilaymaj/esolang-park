@@ -98,7 +98,7 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
       } else {
         // Next step is a regular method instruction
         const nextOp = currFrame.recipe.method[currFrame.pc];
-        nextStepLocation = this.convertTo1Index(nextOp.location);
+        nextStepLocation = nextOp.location;
       }
     }
 
@@ -189,19 +189,6 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
     }
 
     if (opOutput) return opOutput;
-  }
-
-  private convertTo1Index(location: DocumentRange): DocumentRange {
-    const lineNum = location.line + 1;
-    const charRange = location.charRange
-      ? {
-          start: location.charRange.start
-            ? location.charRange.start + 1
-            : undefined,
-          end: location.charRange.end ? location.charRange.end + 1 : undefined,
-        }
-      : undefined;
-    return { line: lineNum, charRange };
   }
 
   /**

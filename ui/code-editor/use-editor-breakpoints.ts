@@ -51,7 +51,9 @@ export const useEditorBreakpoints = ({
 
       // Update breakpoints to parent
       const bpLineNumStrs = Object.keys(breakpoints.current);
-      const bpLineNums = bpLineNumStrs.map((numStr) => parseInt(numStr, 10));
+      const bpLineNums = bpLineNumStrs.map(
+        (numStr) => parseInt(numStr, 10) - 1
+      );
       onUpdateBreakpoints(bpLineNums);
     });
     return () => disposer.dispose();

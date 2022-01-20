@@ -57,7 +57,7 @@ export default class DeadfishLanguageEngine implements LanguageEngine<DFRS> {
         if (OP_CHARS.includes(char as DF_OP)) {
           ast.push({
             instr: char as DF_OP,
-            location: { line: lIdx + 1, char: cIdx + 1 },
+            location: { line: lIdx, char: cIdx },
           });
         }
       });

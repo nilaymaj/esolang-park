@@ -85,7 +85,7 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
         // Add instruction to AST
         ast.push({
           instr: { type: char as BF_OP, param: jumpTarget },
-          location: { line: lIdx + 1, char: cIdx + 1 },
+          location: { line: lIdx, char: cIdx },
         });
       });
     });
