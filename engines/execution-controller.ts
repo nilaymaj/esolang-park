@@ -15,7 +15,6 @@ class ExecutionController<RS> {
   private _breakpoints: number[] = [];
   private _result: StepExecutionResult<RS> | null;
   private _resolvePause: (() => void) | null = null;
-  private _execInterval: NodeJS.Timeout | null = null;
   private _isPaused: boolean = false;
 
   /**
@@ -105,20 +104,21 @@ class ExecutionController<RS> {
    * Execute the loaded program until stopped.
    * @param param0.interval Interval between two execution steps
    * @param param0.onResult Callback called with result on each execution step
+   * @returns Promise that resolves with result of last execution step
    */
   executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
     // Clear paused state
     this._isPaused = false;
 
-    // Run execution loop using an Interval
-    this._execInterval = setInterval(() => {
-      const doBreak = this.runExecLoopIteration();
-      onResult(this._result!);
-      if (doBreak) {
-        clearInterval(this._execInterval!);
-        this._execInterval = null;
+    return new Promise(async (resolve) => {
+      while (true) {
+        const doBreak = this.runExecLoopIteration();
+        onResult(this._result!);
+        if (doBreak) break;
+        await this.sleep(interval);
       }
-    }, interval);
+      resolve(this._result!);
+    });
   }
 
   /**
@@ -150,6 +150,11 @@ class ExecutionController<RS> {
     }
 
     return false;
+  }
+
+  /** Sleep for `ms` milliseconds */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
