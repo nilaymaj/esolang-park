@@ -136,7 +136,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
       renderEditor={() => (
         <CodeEditor
           ref={codeEditorRef}
-          languageId="brainfuck"
+          languageId={langName}
           readOnly={execController.state === "processing"}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}

@@ -98,7 +98,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   return (
     <Editor
       theme={isDark ? "ep-dark" : "ep-light"}
-      defaultLanguage="brainfuck"
+      defaultLanguage={props.languageId}
       defaultValue={props.defaultValue}
       beforeMount={(monaco) => {
         monaco.editor.defineTheme("ep-dark", darkTheme as any);
