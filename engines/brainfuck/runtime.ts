@@ -1,5 +1,5 @@
 import { DocumentRange, LanguageEngine, StepExecutionResult } from "../types";
-import { RuntimeError } from "../worker-errors";
+import { ParseError, RuntimeError } from "../worker-errors";
 import { BFAstStep, BFInstruction, BFRS, BF_OP } from "./common";
 
 // Default values for internal states
@@ -75,14 +75,19 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
         if (!OP_CHARS.includes(char as BF_OP)) return;
 
         // Update loop-tracking stack if it's a loop-char
-        let jumpTarget = undefined;
+        let jumpTarget: number | undefined = undefined;
         if (char === BF_OP.LOOPIN) {
           // Push loop start into stack
           // Opposite end location will be added at loop close
           loopStack.push(ast.length);
         } else if (char === BF_OP.LOOPOUT) {
-          // Get location of loop-opener
-          jumpTarget = loopStack.pop()!;
+          // Check and add jump target to loop-opener
+          jumpTarget = loopStack.pop();
+          if (jumpTarget == null)
+            throw new ParseError("Unmatched ']'", {
+              line: lIdx,
+              charRange: { start: cIdx, end: cIdx + 1 },
+            });
           // Add closing end location to loop-opener
           ast[jumpTarget].instr.param = ast.length;
         }
@@ -94,6 +99,16 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
         });
       });
     });
+
+    // Ensure that we ended with an empty loop stack
+    if (loopStack.length !== 0) {
+      const opener = loopStack[loopStack.length - 1];
+      const location = ast[opener].location;
+      throw new ParseError("Unmatched '['", {
+        line: location.line,
+        charRange: { start: location.char, end: location.char + 1 },
+      });
+    }
 
     return ast;
   }
