@@ -66,7 +66,7 @@ const parseArithmeticOp = (line: string): C.ChefArithmeticOp => {
   )
     return { code, ing: matches[2], bowlId };
 
-  throw new Error("Malformed instruction");
+  throw new SyntaxError("Malformed instruction");
 };
 
 /** Assert that a line matches the given regex and return matches */
@@ -98,7 +98,7 @@ export const parseIngredientItem = (
 
   // Parse next word as measurement unit
   const measure = parseMeasure(words[words.length - 1]);
-  if (hasMeasureType && !measure) throw new Error("Invalid measure");
+  if (hasMeasureType && !measure) throw new SyntaxError("Invalid measure");
   if (measure) words.pop();
 
   // Parse rest of word as name of ingredient

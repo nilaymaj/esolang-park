@@ -1,4 +1,5 @@
 import { DocumentRange, LanguageEngine, StepExecutionResult } from "../types";
+import { RuntimeError } from "../worker-errors";
 import { BFAstStep, BFInstruction, BFRS, BF_OP } from "./common";
 
 // Default values for internal states
@@ -172,7 +173,7 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
 
   /** Move the tape pointer one cell to the left */
   private decrementPtr(): void {
-    if (this._ptr <= 0) throw new Error("Ptr out of bounds");
+    if (this._ptr <= 0) throw new RuntimeError("Tape pointer out of bounds");
     this._ptr -= 1;
     this.getCell(this._ptr); // Init cell if required
   }

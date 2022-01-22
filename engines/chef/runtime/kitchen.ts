@@ -7,6 +7,7 @@ import {
   StackItem,
 } from "../types";
 import InputStream from "./input-stream";
+import { RuntimeError } from "../../worker-errors";
 
 /** Type for a list maintained as an index map */
 type IndexList<T> = { [k: string]: T };
@@ -72,9 +73,9 @@ export default class ChefKitchen {
 
   getIngredient(name: string, assertValue?: boolean): IngredientItem {
     const item = this._ingredients[name];
-    if (!item) throw new Error(`Ingredient '${name}' does not exist`);
+    if (!item) throw new RuntimeError(`Ingredient '${name}' does not exist`);
     if (assertValue && item.value == null)
-      throw new Error(`Ingredient '${name}' is undefined`);
+      throw new RuntimeError(`Ingredient '${name}' is undefined`);
     else return item;
   }
 
@@ -113,7 +114,7 @@ export default class ChefKitchen {
   /** Pop value from a mixing bowl and store into an ingredient */
   popFromBowl(bowlId: number, ingredient: string): void {
     const bowl = this.getBowl(bowlId);
-    if (bowl.length === 0) throw new Error(`Bowl ${bowlId} is empty`);
+    if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
 
     const item = bowl.pop() as StackItem;
     this.getIngredient(ingredient).type = item.type;
@@ -126,7 +127,7 @@ export default class ChefKitchen {
    */
   addValue(bowlId: number, ingredient: string): void {
     const bowl = this.getBowl(bowlId);
-    if (bowl.length === 0) throw new Error(`Bowl ${bowlId} is empty`);
+    if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
     const bowlValue = bowl.pop()!.value;
     const ingValue = this.getIngredient(ingredient, true).value as number;
     bowl.push({ type: "unknown", value: ingValue + bowlValue });
@@ -138,7 +139,7 @@ export default class ChefKitchen {
    */
   subtractValue(bowlId: number, ingredient: string): void {
     const bowl = this.getBowl(bowlId);
-    if (bowl.length === 0) throw new Error(`Bowl ${bowlId} is empty`);
+    if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
     const bowlValue = bowl.pop()!.value;
     const ingValue = this.getIngredient(ingredient, true).value as number;
     bowl.push({ type: "unknown", value: bowlValue - ingValue });
@@ -150,7 +151,7 @@ export default class ChefKitchen {
    */
   multiplyValue(bowlId: number, ingredient: string): void {
     const bowl = this.getBowl(bowlId);
-    if (bowl.length === 0) throw new Error(`Bowl ${bowlId} is empty`);
+    if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
     const bowlValue = bowl.pop()!.value;
     const ingValue = this.getIngredient(ingredient, true).value as number;
     bowl.push({ type: "unknown", value: ingValue * bowlValue });
@@ -162,7 +163,7 @@ export default class ChefKitchen {
    */
   divideValue(bowlId: number, ingredient: string): void {
     const bowl = this.getBowl(bowlId);
-    if (bowl.length === 0) throw new Error(`Bowl ${bowlId} is empty`);
+    if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
     const bowlValue = bowl.pop()!.value;
     const ingValue = this.getIngredient(ingredient, true).value as number;
     bowl.push({ type: "unknown", value: bowlValue / ingValue });
@@ -173,7 +174,8 @@ export default class ChefKitchen {
     const totalValue = Object.keys(this._ingredients).reduce((sum, name) => {
       const ing = this._ingredients[name];
       if (ing.type !== "dry") return sum;
-      if (ing.value == null) throw new Error(`Ingredient ${name} is undefined`);
+      if (ing.value == null)
+        throw new RuntimeError(`Ingredient ${name} is undefined`);
       return sum + ing.value;
     }, 0);
     this.getBowl(bowlId).push({ type: "dry", value: totalValue });

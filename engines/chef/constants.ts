@@ -1,11 +1,17 @@
 import { MonacoTokensProvider } from "../types";
 
+/** Error thrown on malformed syntax. Caught and converted into ParseError higher up */
 export class SyntaxError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "SyntaxError";
   }
 }
+
+/** Check if an error is instance of SyntaxError */
+export const isSyntaxError = (error: any): error is SyntaxError => {
+  return error instanceof SyntaxError || error.name === "SyntaxError";
+};
 
 /** Sample Hello World program for Chef */
 export const sampleProgram = [
@@ -50,7 +56,7 @@ export const editorTokensProvider: MonacoTokensProvider = {
       [/Method./, "red"],
       [/mixing bowl/, "green"],
       [/baking dish/, "blue"],
-      [/\d/, "sepia"],
+      [/\d(st|nd|rd|th)?/, "sepia"],
     ],
   },
   defaultToken: "plain",

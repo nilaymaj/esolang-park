@@ -1,3 +1,5 @@
+import { RuntimeError } from "../../worker-errors";
+
 /**
  * A barebones input stream implementation for consuming integers from a string.
  */
@@ -20,10 +22,10 @@ export default class InputStream {
   getNumber(): number {
     this.exhaustLeadingWhitespace();
     // The extra whitespace differentiates whether string is empty or all numbers.
-    if (this._text === "") throw new Error("Unexpected end of input");
+    if (this._text === "") throw new RuntimeError("Unexpected end of input");
     let posn = this._text.search(/[^0-9]/);
     if (posn === 0)
-      throw new Error(`Unexpected input character: '${this._text[0]}'`);
+      throw new RuntimeError(`Unexpected input character: '${this._text[0]}'`);
     if (posn === -1) posn = this._text.length;
     // Consume and parse numeric part
     const numStr = this._text.slice(0, posn);

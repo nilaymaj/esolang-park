@@ -3,7 +3,6 @@ import {
   LanguageEngine,
   StepExecutionResult,
 } from "../../types";
-import { UnexpectedError } from "../../errors";
 import { parseProgram } from "../parser";
 import * as T from "../types";
 import InputStream from "./input-stream";
@@ -62,8 +61,7 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
       currFrame.pc += 1;
     } else if (currFrame.pc === currFrame.recipe.method.length) {
       // Execution of the "Serves" statement
-      const serves = currFrame.recipe.serves;
-      if (!serves) throw new UnexpectedError();
+      const serves = currFrame.recipe.serves!;
       output = this.getKitchenOutput(currFrame.kitchen, serves.num);
       currFrame.pc += 1;
     } else {
@@ -157,7 +155,7 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
 
         // Check value of loop-opener ingredient
         const opener = currRecipe.recipe.method[op.opener].op;
-        if (opener.code !== "LOOP-OPEN") throw new UnexpectedError();
+        if (opener.code !== "LOOP-OPEN") throw new Error("Bad jump address");
         const ing = currRecipe.kitchen.getIngredient(opener.ing, true);
         if (ing.value === 0) currRecipe.pc += 1;
         else currRecipe.pc = op.opener;
@@ -261,7 +259,7 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
 
   /** Get topmost frame in call stack. Throws if stack is empty. */
   private getCurrentFrame(): CallStackItem {
-    if (this._stack.length === 0) throw new UnexpectedError();
+    if (this._stack.length === 0) throw new Error("Call stack is empty");
     return this._stack[this._stack.length - 1];
   }
 

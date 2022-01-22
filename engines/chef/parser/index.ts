@@ -1,8 +1,8 @@
 import * as T from "../types";
 import { DocumentRange } from "../../types";
 import { parseIngredientItem, parseMethodStep } from "./core";
-import { ParseError, UnexpectedError } from "../../errors";
-import { SyntaxError } from "../constants";
+import { ParseError } from "../../worker-errors";
+import { isSyntaxError, SyntaxError } from "../constants";
 
 /**
  * We parse a Chef program by creating an array containing the lines of code (with line nos)
@@ -106,8 +106,7 @@ const parseIngredientsSection = (stack: CodeStack): T.IngredientBox => {
   const box: T.IngredientBox = {};
   while (stack[stack.length - 1].line.trim() !== "") {
     const { line, row } = popCodeStack(stack);
-    if (line === null) throw new UnexpectedError();
-    const { name, item } = parseIngredientItem(line);
+    const { name, item } = parseIngredientItem(line!);
     box[name] = item;
   }
   return box;
@@ -117,8 +116,7 @@ const parseIngredientsSection = (stack: CodeStack): T.IngredientBox => {
 const parseCookingTime = (stack: CodeStack): void => {
   const regex = /^Cooking time: \d+ (?:hours?|minutes?).$/;
   const { line, row } = popCodeStack(stack, true);
-  if (!line) throw new UnexpectedError();
-  if (!line.match(regex))
+  if (!line!.match(regex))
     throw new ParseError("Malformed cooking time statement", { line: row });
 };
 
@@ -127,8 +125,7 @@ const parseOvenSetting = (stack: CodeStack): void => {
   const regex =
     /^Pre-heat oven to \d+ degrees Celsius(?: \(gas mark [\d/]+\))?.$/;
   const { line, row } = popCodeStack(stack, true);
-  if (!line) throw new UnexpectedError();
-  if (!line.match(regex))
+  if (!line!.match(regex))
     throw new ParseError("Malformed oven setting", { line: row });
 };
 
@@ -150,7 +147,7 @@ const parseMethodSection = (stack: CodeStack): T.ChefOpWithLocation[] => {
     try {
       processMethodSegment(segment, index, ops, loopStack, pendingBreaks);
     } catch (error) {
-      if (error instanceof SyntaxError)
+      if (isSyntaxError(error))
         throw new ParseError(error.message, segment.location);
       else throw error;
     }
@@ -193,25 +190,24 @@ const processMethodSegment = (
 
     case "LOOP-CLOSE": {
       // Validate match with innermost loop
-      const loop = loopStack.pop();
-      if (!loop) throw new Error("Loop-closer found at top-level");
+      const loop = loopStack.pop()!;
       if (loop.verb !== op.verb)
-        throw new Error(
-          `Loop verb mismatch: expected ${loop.verb}, found ${op.verb}`
+        throw new SyntaxError(
+          `Loop verb mismatch: expected '${loop.verb}', found '${op.verb}'`
         );
 
       op.opener = loop.opener;
 
       // Add jump address to loop opener
       const openerOp = ops[loop.opener].op;
-      if (openerOp.code !== "LOOP-OPEN") throw new UnexpectedError();
+      if (openerOp.code !== "LOOP-OPEN") throw new Error("Bad jump address");
       openerOp.closer = index;
 
       // Add jump address to intermediate loop-breaks
       while (pendingBreaks.length) {
         const breaker = ops[pendingBreaks.pop()!].op;
         if (breaker.code !== "LOOP-BREAK")
-          throw new Error("Something weird occured");
+          throw new Error("Memorized op not a breaker");
         breaker.closer = index;
       }
 
@@ -225,9 +221,7 @@ const serializeMethodOps = (stack: CodeStack): MethodSegment[] => {
   const segments: MethodSegment[] = [];
 
   while (stack.length && stack[stack.length - 1].line.trim() !== "") {
-    // Pop next line from code stack
-    const item = stack.pop();
-    if (!item?.line.trim()) throw new UnexpectedError();
+    const item = stack.pop()!;
 
     // Find all the periods in the line
     const periodIdxs: number[] = [-1];
@@ -253,8 +247,7 @@ const serializeMethodOps = (stack: CodeStack): MethodSegment[] => {
 /** Parse the stack for a "Serves N" statement */
 const parseServesLine = (stack: CodeStack): T.ChefRecipeServes => {
   const { line, row } = popCodeStack(stack, true);
-  if (!line) throw new UnexpectedError();
-  const match = line.match(/^Serves (\d+).$/);
+  const match = line!.match(/^Serves (\d+).$/);
   if (!match) throw new ParseError("Malformed serves statement", { line: row });
   return { line: row, num: parseInt(match[1], 10) };
 };
@@ -318,9 +311,12 @@ const validateRecipe = (
   for (const line of recipe.method) {
     const ingName = (line.op as any).ing;
     if (ingName && !recipe.ingredients[ingName])
-      throw new Error(`Invalid ingredient: ${ingName}`);
+      throw new ParseError(`Invalid ingredient: ${ingName}`, line.location);
     if (line.op.code === "FNCALL" && !auxes[line.op.recipe])
-      throw new Error(`Invalid recipe name: ${line.op.recipe}`);
+      throw new ParseError(
+        `Invalid recipe name: ${line.op.recipe}`,
+        line.location
+      );
   }
 };
 

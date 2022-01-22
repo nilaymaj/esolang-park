@@ -7,7 +7,6 @@ const formatParseError = (error: WorkerParseError): string => {
   const line = error.range.line + 1;
   const start = error.range.charRange?.start;
   const end = error.range.charRange?.end;
-  console.log(line, start, end);
   let cols: string | null = null;
   if (start != null && end != null) cols = `col ${start + 1}-${end + 1}`;
   else if (start != null) cols = `col ${start + 1}`;
