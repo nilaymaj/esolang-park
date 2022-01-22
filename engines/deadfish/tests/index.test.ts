@@ -1,26 +1,9 @@
 import { readTestProgram, executeProgram } from "../../test-utils";
-// import { BFRS, serializeTapeMap } from "../constants";
 import Engine from "../runtime";
 
 /**
- * All test programs are picked up from https://esolangs.org/wiki/Brainfuck.
- * - Cell cleanup code at end of cell size program is not included.
+ * All test programs are picked up from https://esolangs.org/wiki/Deadfish.
  */
-
-/**
- * Check if actual cell array matches expected cell array.
- * Expected cell array must exclude trailing zeros.
- * @param cellsMap Map of cell index to value, as provided in execution result.
- * @param expected Array of expected cell values, without trailing zeros.
- */
-// const expectCellsToBe = (cellsMap: BFRS["tape"], expected: number[]) => {
-//   const cells = serializeTapeMap(cellsMap);
-//   expect(cells.length).toBeGreaterThanOrEqual(expected.length);
-//   cells.forEach((value, idx) => {
-//     if (idx < expected.length) expect(value).toBe(expected[idx]);
-//     else expect(value).toBe(0);
-//   });
-// };
 
 describe("Test programs", () => {
   // Standard hello-world program
