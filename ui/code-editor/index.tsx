@@ -42,8 +42,6 @@ type Props = {
 const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const [editor, setEditor] = React.useState<EditorInstance | null>(null);
   const [monaco, setMonaco] = React.useState<MonacoInstance | null>(null);
-  // const editorRef = React.useRef<EditorInstance | null>(null);
-  // const monacoRef = React.useRef<MonacoInstance | null>(null);
   const highlightRange = React.useRef<string[]>([]);
   const { isDark } = useDarkMode();
 
@@ -68,17 +66,22 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   });
 
   /** Update code highlights */
-  const updateHighlights = React.useCallback((hl: DocumentRange | null) => {
-    // Remove previous highlights
-    const prevRange = highlightRange.current;
-    editor!.deltaDecorations(prevRange, []);
+  const updateHighlights = React.useCallback(
+    (hl: DocumentRange | null) => {
+      if (!editor) return;
 
-    // Add new highlights
-    if (!hl) return;
-    const newRange = createHighlightRange(monaco!, hl);
-    const rangeStr = editor!.deltaDecorations([], [newRange]);
-    highlightRange.current = rangeStr;
-  }, []);
+      // Remove previous highlights
+      const prevRange = highlightRange.current;
+      editor.deltaDecorations(prevRange, []);
+
+      // Add new highlights
+      if (!hl) return;
+      const newRange = createHighlightRange(monaco!, hl);
+      const rangeStr = editor.deltaDecorations([], [newRange]);
+      highlightRange.current = rangeStr;
+    },
+    [editor]
+  );
 
   // Provide handle to parent for accessing editor contents
   React.useImperativeHandle(
