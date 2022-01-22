@@ -117,7 +117,7 @@ const parseCookingTime = (stack: CodeStack): void => {
   const regex = /^Cooking time: \d+ (?:hours?|minutes?).$/;
   const { line, row } = popCodeStack(stack, true);
   if (!line!.match(regex))
-    throw new ParseError("Malformed cooking time statement", { line: row });
+    throw new ParseError("Invalid cooking time statement", { line: row });
 };
 
 /** Parse stack for oven setting statement. No data is returned. */
@@ -126,7 +126,7 @@ const parseOvenSetting = (stack: CodeStack): void => {
     /^Pre-heat oven to \d+ degrees Celsius(?: \(gas mark [\d/]+\))?.$/;
   const { line, row } = popCodeStack(stack, true);
   if (!line!.match(regex))
-    throw new ParseError("Malformed oven setting", { line: row });
+    throw new ParseError("Invalid oven setting statement", { line: row });
 };
 
 /** Parse the stack for the header of method section */

@@ -66,13 +66,13 @@ const parseArithmeticOp = (line: string): C.ChefArithmeticOp => {
   )
     return { code, ing: matches[2], bowlId };
 
-  throw new SyntaxError("Malformed instruction");
+  throw new SyntaxError("Instruction has incorrect syntax");
 };
 
 /** Assert that a line matches the given regex and return matches */
 const assertMatch = (line: string, regex: RegExp): RegExpMatchArray => {
   const matches = line.match(regex);
-  if (!matches) throw new SyntaxError("Malformed instruction");
+  if (!matches) throw new SyntaxError("Unknown instruction");
   return matches;
 };
 
