@@ -29,10 +29,10 @@ export const executeProgram = async <T>(
 ): Promise<{ output: string; rendererState: T }> => {
   const controller = new ExecutionController(engine);
   controller.prepare(code, input);
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       let output = "";
-      controller.executeAll({
+      const { error } = await controller.executeAll({
         interval: 0,
         onResult: (res) => {
           if (res.output) output += res.output;
@@ -41,6 +41,7 @@ export const executeProgram = async <T>(
           }
         },
       });
+      if (error) reject(error);
     } catch (error) {
       reject(error);
     }
