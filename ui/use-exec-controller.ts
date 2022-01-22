@@ -4,6 +4,7 @@ import {
   WorkerRequestData,
   WorkerResponseData,
 } from "../engines/worker-constants";
+import { WorkerParseError, WorkerRuntimeError } from "../engines/worker-errors";
 
 /** Possible states for the worker to be in */
 type WorkerState =
@@ -12,6 +13,7 @@ type WorkerState =
   | "ready" // Ready to start execution
   | "processing" // Executing code
   | "paused" // Execution currently paused
+  | "error" // Execution ended due to error
   | "done"; // Program ended, reset now
 
 /**
@@ -40,10 +42,10 @@ export const useExecController = <RS>(langName: string) => {
    */
   const requestWorker = (
     request: WorkerRequestData,
-    onData?: (data: WorkerResponseData<RS>) => boolean
-  ): Promise<WorkerResponseData<RS>> => {
+    onData?: (data: WorkerResponseData<RS, any>) => boolean
+  ): Promise<WorkerResponseData<RS, any>> => {
     return new Promise((resolve) => {
-      const handler = (ev: MessageEvent<WorkerResponseData<RS>>) => {
+      const handler = (ev: MessageEvent<WorkerResponseData<RS, any>>) => {
         if (!onData) {
           // Normal mode
           workerRef.current!.removeEventListener("message", handler);
@@ -65,7 +67,7 @@ export const useExecController = <RS>(langName: string) => {
   /** Utility to throw error on unexpected response */
   const throwUnexpectedRes = (
     fnName: string,
-    res: WorkerResponseData<RS>
+    res: WorkerResponseData<RS, any>
   ): never => {
     throw new Error(`Unexpected response on ${fnName}: ${JSON.stringify(res)}`);
   };
@@ -75,6 +77,9 @@ export const useExecController = <RS>(langName: string) => {
     (async () => {
       if (workerRef.current) throw new Error("Tried to reinitialize worker");
       workerRef.current = new Worker(`../workers/${langName}.js`);
+      workerRef.current!.addEventListener("error", (ev) =>
+        console.log("Ev: ", ev)
+      );
       const res = await requestWorker({ type: "Init" });
       if (res.type === "ack" && res.data === "init") setWorkerState("empty");
       else throwUnexpectedRes("init", res);
@@ -92,14 +97,19 @@ export const useExecController = <RS>(langName: string) => {
    * @param code Code content
    * @param input User input
    */
-  const prepare = React.useCallback(async (code: string, input: string) => {
-    const res = await requestWorker({
-      type: "Prepare",
-      params: { code, input },
-    });
-    if (res.type === "ack" && res.data === "prepare") setWorkerState("ready");
-    else throwUnexpectedRes("loadCode", res);
-  }, []);
+  const prepare = React.useCallback(
+    async (code: string, input: string): Promise<WorkerParseError | void> => {
+      const res = await requestWorker({
+        type: "Prepare",
+        params: { code, input },
+      });
+      if (res.type === "ack" && res.data === "prepare") {
+        if (res.error) return res.error;
+        else setWorkerState("ready");
+      } else throwUnexpectedRes("loadCode", res);
+    },
+    []
+  );
 
   /**
    * Update debugging breakpoints in the execution controller.
@@ -142,14 +152,18 @@ export const useExecController = <RS>(langName: string) => {
    * Run a single step of execution
    * @return Execution result
    */
-  const executeStep = React.useCallback(async () => {
+  const executeStep = React.useCallback(async (): Promise<{
+    result: StepExecutionResult<RS>;
+    error?: WorkerRuntimeError;
+  }> => {
     const res = await requestWorker(
       { type: "ExecuteStep" },
       (res) => res.type !== "result"
     );
     if (res.type !== "result") throw new Error("Something unexpected happened");
     if (!res.data.nextStepLocation) setWorkerState("done");
-    return res.data;
+
+    return { result: res.data, error: res.error };
   }, []);
 
   /**
@@ -158,19 +172,28 @@ export const useExecController = <RS>(langName: string) => {
    */
   const execute = React.useCallback(
     async (
-      onResult: (result: StepExecutionResult<RS>) => void,
+      onResult: (
+        result: StepExecutionResult<RS>,
+        error?: WorkerRuntimeError
+      ) => void,
       interval: number
     ) => {
       setWorkerState("processing");
       // Set up a streaming-response cycle with the worker
       await requestWorker({ type: "Execute", params: { interval } }, (res) => {
         if (res.type !== "result") return true;
-        onResult(res.data);
+        onResult(res.data, res.error);
         if (!res.data.nextStepLocation) {
+          // Program execution complete
           setWorkerState("done");
           return false;
         } else if (res.data.signal === "paused") {
+          // Execution paused by user or breakpoint
           setWorkerState("paused");
+          return false;
+        } else if (res.error) {
+          // Runtime error occured
+          setWorkerState("error");
           return false;
         } else return true;
       });

@@ -1,4 +1,5 @@
-import { StepExecutionResult } from "./types";
+import { DocumentRange, StepExecutionResult } from "./types";
+import * as E from "./worker-errors";
 
 /** Types of requests the worker handles */
 export type WorkerRequestData =
@@ -39,7 +40,28 @@ export type WorkerAckType =
   | "prepare" // on preparing for execution
   | "pause"; // on pausing execution
 
+/** Errors associated with each response ack type */
+export type WorkerAckError = {
+  init: undefined;
+  reset: undefined;
+  "bp-update": undefined;
+  prepare: E.WorkerParseError;
+  pause: undefined;
+};
+
 /** Types of responses the worker can send */
-export type WorkerResponseData<RS> =
-  | { type: "ack"; data: WorkerAckType }
-  | { type: "result"; data: StepExecutionResult<RS> };
+export type WorkerResponseData<RS, A extends WorkerAckType> =
+  /** Ack for one-off requests, optionally containing error occured (if any) */
+  | {
+      type: "ack";
+      data: A;
+      error?: WorkerAckError[A];
+    }
+  /** Response containing step execution result, and runtime error (if any) */
+  | {
+      type: "result";
+      data: StepExecutionResult<RS>;
+      error?: E.WorkerRuntimeError;
+    }
+  /** Response indicating a bug in worker/engine logic */
+  | { type: "error"; error: Error };

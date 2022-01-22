@@ -25,6 +25,9 @@ const styles = {
   },
 };
 
+/** Possible states of the debug controls component */
+type DebugControlsState = "off" | "running" | "paused" | "error";
+
 /** Input field for changing execution interval */
 const IntervalInput = (props: {
   disabled: boolean;
@@ -62,25 +65,30 @@ const RunButton = ({ onClick }: { onClick: () => void }) => (
 
 /** Button group for debugging controls */
 const DebugControls = (props: {
-  paused: boolean;
+  state: DebugControlsState;
   onPause: () => void;
   onResume: () => void;
   onStep: () => void;
   onStop: () => void;
 }) => {
+  const paused = props.state === "paused" || props.state === "error";
+  const pauseDisabled = props.state === "error";
+  const stepDisabled = ["off", "running", "error"].includes(props.state);
+
   return (
     <ButtonGroup>
       <Button
         small
-        title={props.paused ? "Pause" : "Resume"}
-        onClick={props.paused ? props.onResume : props.onPause}
-        icon={<Icon icon={props.paused ? "play" : "pause"} intent="primary" />}
+        title={paused ? "Pause" : "Resume"}
+        disabled={pauseDisabled}
+        onClick={paused ? props.onResume : props.onPause}
+        icon={<Icon icon={paused ? "play" : "pause"} intent="primary" />}
       />
       <Button
         small
         title="Step"
         onClick={props.onStep}
-        disabled={!props.paused}
+        disabled={stepDisabled}
         icon={<Icon icon="step-forward" intent="warning" />}
       />
       <Button
@@ -94,7 +102,7 @@ const DebugControls = (props: {
 };
 
 type Props = {
-  state: "off" | "running" | "paused";
+  state: DebugControlsState;
   onRun: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -110,7 +118,7 @@ export const ExecutionControls = (props: Props) => {
         <RunButton onClick={props.onRun} />
       ) : (
         <DebugControls
-          paused={props.state === "paused"}
+          state={props.state}
           onPause={props.onPause}
           onResume={props.onResume}
           onStep={props.onStep}

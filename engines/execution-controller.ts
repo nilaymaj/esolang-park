@@ -1,4 +1,9 @@
 import { LanguageEngine, StepExecutionResult } from "./types";
+import {
+  isRuntimeError,
+  serializeRuntimeError,
+  WorkerRuntimeError,
+} from "./worker-errors";
 
 type ExecuteAllArgs<RS> = {
   /** Interval between two execution steps, in milliseconds */
@@ -94,30 +99,53 @@ class ExecutionController<RS> {
    * Run a single step of execution
    * @returns Result of execution
    */
-  executeStep(): StepExecutionResult<RS> {
-    this._result = this._engine.executeStep();
-    this._result.signal = "paused";
-    return this._result;
+  executeStep(): {
+    result: StepExecutionResult<RS>;
+    error?: WorkerRuntimeError;
+  } {
+    try {
+      this._result = this._engine.executeStep();
+      this._result.signal = "paused";
+      return { result: this._result };
+    } catch (error) {
+      if (isRuntimeError(error))
+        return { result: this._result!, error: serializeRuntimeError(error) };
+      else throw error;
+    }
   }
 
   /**
-   * Execute the loaded program until stopped.
+   * Execute the loaded program until stopped. Throws if an error other than RuntimeError is encountered.
    * @param param0.interval Interval between two execution steps
    * @param param0.onResult Callback called with result on each execution step
-   * @returns Promise that resolves with result of last execution step
+   * @returns Promise that resolves with result of last execution step and RuntimeError if any
    */
-  executeAll({ interval, onResult }: ExecuteAllArgs<RS>) {
+  executeAll({ interval, onResult }: ExecuteAllArgs<RS>): Promise<{
+    result: StepExecutionResult<RS>;
+    error?: WorkerRuntimeError;
+  }> {
     // Clear paused state
     this._isPaused = false;
 
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       while (true) {
-        const doBreak = this.runExecLoopIteration();
-        onResult(this._result!);
-        if (doBreak) break;
-        await this.sleep(interval);
+        try {
+          const doBreak = this.runExecLoopIteration();
+          onResult(this._result!);
+          if (doBreak) break;
+          await this.sleep(interval);
+        } catch (error) {
+          if (isRuntimeError(error)) {
+            this._isPaused = true;
+            resolve({
+              result: this._result!,
+              error: serializeRuntimeError(error),
+            });
+          } else reject(error);
+          break;
+        }
       }
-      resolve(this._result!);
+      resolve({ result: this._result! });
     });
   }
 

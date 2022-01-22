@@ -1,18 +1,18 @@
 import React from "react";
-import { TextArea } from "@blueprintjs/core";
+import { Colors, Text } from "@blueprintjs/core";
+import { WorkerParseError, WorkerRuntimeError } from "../engines/worker-errors";
 
-/**
- * For aesthetic reasons, we use readonly textarea for displaying output.
- * Textarea displays placeholder if value passed is empty string, which is undesired.
- * This function is a fake-whitespace workaround.
- *
- * @param value Value received from parent. Placeholder shown on `null`.
- * @returns Value to pass as prop to Blueprint TextArea
- */
-const toTextareaValue = (value: string | null): string | undefined => {
-  if (value == null) return undefined; // Placeholder shown
-  if (value === "") return "\u0020"; // Fake whitespace to hide placeholder
-  return value; // Non-empty output value
+/** Format a ParseError for displaying as output */
+const formatParseError = (error: WorkerParseError): string => {
+  const line = error.range.line + 1;
+  const start = error.range.charRange?.start;
+  const end = error.range.charRange?.end;
+  console.log(line, start, end);
+  let cols: string | null = null;
+  if (start != null && end != null) cols = `col ${start + 1}-${end + 1}`;
+  else if (start != null) cols = `col ${start + 1}`;
+  else if (end != null) cols = `col ${end + 1}`;
+  return `ParseError: line ${line}, ${cols}\n${error.message}`;
 };
 
 export interface OutputViewerRef {
@@ -20,26 +20,36 @@ export interface OutputViewerRef {
   reset: () => void;
   /** Append string to the displayed output */
   append: (str?: string) => void;
+  /** Add error text below the output text */
+  setError: (error: WorkerRuntimeError | WorkerParseError | null) => void;
 }
 
 const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
   const [value, setValue] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useImperativeHandle(ref, () => ({
-    reset: () => setValue(null),
+    reset: () => {
+      setValue(null);
+      setError(null);
+    },
     append: (s) => setValue((o) => (o || "") + (s || "")),
+    setError: (error: WorkerRuntimeError | WorkerParseError | null) => {
+      if (!error) setError(null);
+      else if (error.name === "RuntimeError")
+        setError("RuntimeError: " + error.message);
+      else if (error.name === "ParseError") setError(formatParseError(error));
+    },
   }));
 
   return (
-    <TextArea
-      fill
-      large
-      readOnly
-      growVertically
-      value={toTextareaValue(value)}
-      placeholder="Run code to see output..."
-      style={{ height: "100%", resize: "none", boxShadow: "none" }}
-    />
+    <div style={{ padding: 10, fontSize: 16 }}>
+      <Text style={{ fontFamily: "monospace" }}>{value}</Text>
+      {value && <div style={{ height: 10 }} />}
+      <Text style={{ fontFamily: "monospace", color: Colors.RED3 }}>
+        {error}
+      </Text>
+    </div>
   );
 };
 

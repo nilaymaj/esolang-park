@@ -7,6 +7,7 @@ import { LanguageProvider, StepExecutionResult } from "../engines/types";
 import { OutputViewer, OutputViewerRef } from "../ui/output-viewer";
 import { ExecutionControls } from "./execution-controls";
 import { RendererRef, RendererWrapper } from "./renderer-wrapper";
+import { WorkerRuntimeError } from "../engines/worker-errors";
 
 type Props<RS> = {
   langName: string;
@@ -36,10 +37,14 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
   const [execInterval, setExecInterval] = React.useState(20);
 
   /** Utility that updates UI with the provided execution result */
-  const updateWithResult = (result: StepExecutionResult<any>) => {
+  const updateWithResult = (
+    result: StepExecutionResult<any>,
+    error?: WorkerRuntimeError
+  ) => {
     rendererRef.current!.updateState(result.rendererState);
     codeEditorRef.current!.updateHighlights(result.nextStepLocation);
     outputEditorRef.current!.append(result.output);
+    if (error) outputEditorRef.current!.setError(error);
   };
 
   /** Reset and begin a new execution */
@@ -54,13 +59,14 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     // Reset any existing execution state
     outputEditorRef.current!.reset();
     await execController.resetState();
-    await execController.prepare(
+    const error = await execController.prepare(
       codeEditorRef.current!.getValue(),
       inputEditorRef.current!.getValue()
     );
 
-    // Begin execution
-    await execController.execute(updateWithResult, execInterval);
+    // Check for ParseError, else begin execution
+    if (error) outputEditorRef.current!.setError(error);
+    else await execController.execute(updateWithResult, execInterval);
   };
 
   /** Pause the ongoing execution */
@@ -82,8 +88,8 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     }
 
     // Run and update execution states
-    const result = await execController.executeStep();
-    updateWithResult(result);
+    const response = await execController.executeStep();
+    updateWithResult(response.result, response.error);
   };
 
   /** Resume the currently paused execution */
@@ -101,7 +107,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
   /** Stop the currently active execution */
   const stopExecution = async () => {
     // Check if controller has execution
-    if (!["paused", "processing"].includes(execController.state)) {
+    if (!["paused", "processing", "error"].includes(execController.state)) {
       console.error("No active execution in controller");
       return;
     }
@@ -112,7 +118,6 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
 
     // Reset all execution states
     await execController.resetState();
-    outputEditorRef.current!.reset();
     rendererRef.current!.updateState(null);
     codeEditorRef.current!.updateHighlights(null);
   };
@@ -122,6 +127,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     const currState = execController.state;
     if (currState === "processing") return "running";
     else if (currState === "paused") return "paused";
+    else if (currState === "error") return "error";
     else return "off";
   };
 
