@@ -56,7 +56,7 @@ export const editorTokensProvider: MonacoTokensProvider = {
       [/Method./, "red"],
       [/mixing bowl/, "green"],
       [/baking dish/, "blue"],
-      [/\d(st|nd|rd|th)?/, "sepia"],
+      [/\d(st|nd|rd|th)?/, "orange"],
     ],
   },
   defaultToken: "plain",
