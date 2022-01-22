@@ -29,6 +29,8 @@ type Props = {
   defaultValue: string;
   /** Tokens provider for the language */
   tokensProvider?: MonacoTokensProvider;
+  /** Set editor as read-only */
+  readOnly?: boolean;
   /** Callback to validate code syntax */
   onValidateCode: (code: string) => Promise<WorkerParseError | undefined>;
   /** Callback to update debugging breakpoints */
@@ -107,7 +109,11 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
         setEditor(editor);
         setMonaco(monaco);
       }}
-      options={{ minimap: { enabled: false }, glyphMargin: true }}
+      options={{
+        minimap: { enabled: false },
+        glyphMargin: true,
+        readOnly: props.readOnly,
+      }}
     />
   );
 };

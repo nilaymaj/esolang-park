@@ -137,6 +137,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
         <CodeEditor
           ref={codeEditorRef}
           languageId="brainfuck"
+          readOnly={execController.state === "processing"}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
           onValidateCode={execController.validateCode}
@@ -151,7 +152,12 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
           renderer={providerRef.current.Renderer as any}
         />
       )}
-      renderInput={() => <InputEditor ref={inputEditorRef} />}
+      renderInput={() => (
+        <InputEditor
+          ref={inputEditorRef}
+          readOnly={execController.state === "processing"}
+        />
+      )}
       renderOutput={() => <OutputViewer ref={outputEditorRef} />}
       renderExecControls={() => (
         <ExecutionControls

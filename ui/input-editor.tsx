@@ -12,7 +12,10 @@ export interface InputEditorRef {
 /**
  * A very simple text editor for user input
  */
-const InputEditorComponent = (_: {}, ref: React.Ref<InputEditorRef>) => {
+const InputEditorComponent = (
+  props: { readOnly?: boolean },
+  ref: React.Ref<InputEditorRef>
+) => {
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   React.useImperativeHandle(
@@ -29,6 +32,7 @@ const InputEditorComponent = (_: {}, ref: React.Ref<InputEditorRef>) => {
       large
       growVertically
       inputRef={textareaRef}
+      readOnly={props.readOnly}
       placeholder="Enter program input here..."
       style={{ height: "100%", resize: "none", boxShadow: "none" }}
     />
