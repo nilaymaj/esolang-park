@@ -14,6 +14,12 @@ export const DarkModeProvider = ({
 }) => {
   const [isDark, setIsDark] = React.useState(true);
 
+  // Set dark theme according to system preference
+  React.useEffect(() => {
+    if (window.matchMedia("(prefers-color-scheme: light)").matches)
+      setIsDark(false);
+  }, []);
+
   return (
     <DarkModeContext.Provider
       value={{ isDark, toggleDark: () => setIsDark((d) => !d) }}
