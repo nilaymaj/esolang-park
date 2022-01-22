@@ -28,6 +28,10 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
     this._pc = DEFAULT_PC;
   }
 
+  validateCode(code: string) {
+    this.parseCode(code);
+  }
+
   prepare(code: string, input: string) {
     this._input = input;
     this._ast = this.parseCode(code);

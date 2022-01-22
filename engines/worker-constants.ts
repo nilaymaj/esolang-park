@@ -1,4 +1,4 @@
-import { DocumentRange, StepExecutionResult } from "./types";
+import { StepExecutionResult } from "./types";
 import * as E from "./worker-errors";
 
 /** Types of requests the worker handles */
@@ -18,6 +18,10 @@ export type WorkerRequestData =
   | {
       type: "UpdateBreakpoints";
       params: { points: number[] };
+    }
+  | {
+      type: "ValidateCode";
+      params: { code: string };
     }
   | {
       type: "Execute";
@@ -56,6 +60,11 @@ export type WorkerResponseData<RS, A extends WorkerAckType> =
       type: "ack";
       data: A;
       error?: WorkerAckError[A];
+    }
+  /** Result of code validation, containing parsing error (if any) */
+  | {
+      type: "validate";
+      error?: E.WorkerParseError;
     }
   /** Response containing step execution result, and runtime error (if any) */
   | {

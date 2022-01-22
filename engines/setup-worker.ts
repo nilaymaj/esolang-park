@@ -13,6 +13,11 @@ const ackMessage = <RS, A extends C.WorkerAckType>(
   error,
 });
 
+/** Create a worker response for code validation result */
+const validationMessage = <RS, A extends C.WorkerAckType>(
+  error?: E.WorkerParseError
+): C.WorkerResponseData<RS, A> => ({ type: "validate", error });
+
 /** Create a worker response for execution result */
 const resultMessage = <RS, A extends C.WorkerAckType>(
   result: StepExecutionResult<RS>,
@@ -72,6 +77,15 @@ const updateBreakpoints = <RS>(
   postMessage(ackMessage("bp-update"));
 };
 
+/** Validate the user's program syntax */
+const validateCode = <RS>(
+  controller: ExecutionController<RS>,
+  code: string
+) => {
+  const error = controller.validateCode(code);
+  postMessage(validationMessage(error));
+};
+
 /**
  * Execute the entire program loaded on engine,
  * and return result of execution.
@@ -112,6 +126,8 @@ export const setupWorker = <RS>(engine: LanguageEngine<RS>) => {
       if (ev.data.type === "Reset") return resetController(controller);
       if (ev.data.type === "Prepare")
         return prepare(controller, ev.data.params);
+      if (ev.data.type === "ValidateCode")
+        return validateCode(controller, ev.data.params.code);
       if (ev.data.type === "Execute")
         return execute(controller, ev.data.params.interval);
       if (ev.data.type === "Pause") return await pauseExecution(controller);

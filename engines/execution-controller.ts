@@ -1,6 +1,8 @@
 import { LanguageEngine, StepExecutionResult } from "./types";
 import {
+  isParseError,
   isRuntimeError,
+  serializeParseError,
   serializeRuntimeError,
   WorkerRuntimeError,
 } from "./worker-errors";
@@ -56,6 +58,19 @@ class ExecutionController<RS> {
    */
   updateBreakpoints(points: number[]) {
     this._breakpoints = points;
+  }
+
+  /**
+   * Validate the syntax of the given code
+   * @param code Code content, lines separated by '\n'
+   */
+  validateCode(code: string) {
+    try {
+      this._engine.validateCode(code);
+    } catch (error) {
+      if (isParseError(error)) return serializeParseError(error);
+      else throw error;
+    }
   }
 
   /**

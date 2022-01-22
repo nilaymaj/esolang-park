@@ -1,5 +1,6 @@
 import monaco from "monaco-editor";
 import { DocumentRange } from "../../engines/types";
+import { WorkerParseError } from "../../engines/worker-errors";
 
 /** Type alias for an instance of Monaco editor */
 export type EditorInstance = monaco.editor.IStandaloneCodeEditor;
@@ -39,6 +40,24 @@ export const createBreakpointRange = (
   const range = new monacoInstance.Range(lineNum, 0, lineNum, 1000);
   const className = "breakpoint-glyph " + (hint ? "hint" : "solid");
   return { range, options: { glyphMarginClassName: className } };
+};
+
+/** Create Monaco syntax-error marker from message and document range */
+export const createValidationMarker = (
+  monacoInstance: MonacoInstance,
+  error: WorkerParseError,
+  range: DocumentRange
+): monaco.editor.IMarkerData => {
+  const location = get1IndexedLocation(range);
+  return {
+    startLineNumber: location.line,
+    endLineNumber: location.line,
+    startColumn: location.charRange?.start || 0,
+    endColumn: location.charRange?.end || 1000,
+    severity: monacoInstance.MarkerSeverity.Error,
+    message: error.message,
+    source: error.name,
+  };
 };
 
 /**

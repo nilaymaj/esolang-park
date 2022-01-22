@@ -77,9 +77,6 @@ export const useExecController = <RS>(langName: string) => {
     (async () => {
       if (workerRef.current) throw new Error("Tried to reinitialize worker");
       workerRef.current = new Worker(`../workers/${langName}.js`);
-      workerRef.current!.addEventListener("error", (ev) =>
-        console.log("Ev: ", ev)
-      );
       const res = await requestWorker({ type: "Init" });
       if (res.type === "ack" && res.data === "init") setWorkerState("empty");
       else throwUnexpectedRes("init", res);
@@ -136,6 +133,21 @@ export const useExecController = <RS>(langName: string) => {
     if (res.type === "ack" && res.data === "reset") setWorkerState("empty");
     else throwUnexpectedRes("resetState", res);
   }, []);
+
+  /**
+   * Validate the syntax of the user's program code
+   * @param code Code content of the user's program
+   */
+  const validateCode = React.useCallback(
+    async (code: string): Promise<WorkerParseError | undefined> => {
+      const res = await requestWorker(
+        { type: "ValidateCode", params: { code } },
+        (res) => res.type !== "validate"
+      );
+      return res.error;
+    },
+    []
+  );
 
   /**
    * Pause program execution
@@ -206,6 +218,7 @@ export const useExecController = <RS>(langName: string) => {
     resetState,
     prepare,
     pauseExecution,
+    validateCode,
     execute,
     executeStep,
     updateBreakpoints,

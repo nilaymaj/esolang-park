@@ -139,6 +139,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
           languageId="brainfuck"
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
+          onValidateCode={execController.validateCode}
           onUpdateBreakpoints={(newPoints) =>
             execController.updateBreakpoints(newPoints)
           }

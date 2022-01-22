@@ -11,6 +11,8 @@ import { useEditorBreakpoints } from "./use-editor-breakpoints";
 import darkTheme from "./themes/dark.json";
 import lightTheme from "./themes/light.json";
 import { useDarkMode } from "../providers/dark-mode-provider";
+import { WorkerParseError } from "../../engines/worker-errors";
+import { useCodeValidator } from "./use-code-validator";
 
 // Interface for interacting with the editor
 export interface CodeEditorRef {
@@ -27,6 +29,8 @@ type Props = {
   defaultValue: string;
   /** Tokens provider for the language */
   tokensProvider?: MonacoTokensProvider;
+  /** Callback to validate code syntax */
+  onValidateCode: (code: string) => Promise<WorkerParseError | undefined>;
   /** Callback to update debugging breakpoints */
   onUpdateBreakpoints: (newBreakpoints: number[]) => void;
 };
@@ -36,15 +40,17 @@ type Props = {
  * only the required functionality to the parent container.
  */
 const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
-  const editorRef = React.useRef<EditorInstance | null>(null);
-  const monacoRef = React.useRef<MonacoInstance | null>(null);
+  const [editor, setEditor] = React.useState<EditorInstance | null>(null);
+  const [monaco, setMonaco] = React.useState<MonacoInstance | null>(null);
+  // const editorRef = React.useRef<EditorInstance | null>(null);
+  // const monacoRef = React.useRef<MonacoInstance | null>(null);
   const highlightRange = React.useRef<string[]>([]);
   const { isDark } = useDarkMode();
 
   // Breakpoints
   useEditorBreakpoints({
-    editor: editorRef.current,
-    monaco: monacoRef.current,
+    editor,
+    monaco,
     onUpdateBreakpoints: props.onUpdateBreakpoints,
   });
 
@@ -54,16 +60,23 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
     tokensProvider: props.tokensProvider,
   });
 
+  // Code validation
+  useCodeValidator({
+    editor,
+    monaco,
+    onValidateCode: props.onValidateCode,
+  });
+
   /** Update code highlights */
   const updateHighlights = React.useCallback((hl: DocumentRange | null) => {
     // Remove previous highlights
     const prevRange = highlightRange.current;
-    editorRef.current!.deltaDecorations(prevRange, []);
+    editor!.deltaDecorations(prevRange, []);
 
     // Add new highlights
     if (!hl) return;
-    const newRange = createHighlightRange(monacoRef.current!, hl);
-    const rangeStr = editorRef.current!.deltaDecorations([], [newRange]);
+    const newRange = createHighlightRange(monaco!, hl);
+    const rangeStr = editor!.deltaDecorations([], [newRange]);
     highlightRange.current = rangeStr;
   }, []);
 
@@ -71,10 +84,10 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   React.useImperativeHandle(
     ref,
     () => ({
-      getValue: () => editorRef.current!.getValue(),
+      getValue: () => editor!.getValue(),
       updateHighlights,
     }),
-    []
+    [editor]
   );
 
   return (
@@ -88,8 +101,8 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
       }}
       onMount={(editor, monaco) => {
         if (!editor || !monaco) throw new Error("Error in initializing editor");
-        editorRef.current = editor;
-        monacoRef.current = monaco;
+        setEditor(editor);
+        setMonaco(monaco);
       }}
       options={{ minimap: { enabled: false }, glyphMargin: true }}
     />

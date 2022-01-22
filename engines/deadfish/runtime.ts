@@ -21,6 +21,10 @@ export default class DeadfishLanguageEngine implements LanguageEngine<DFRS> {
     this._pc = DEFAULT_PC;
   }
 
+  validateCode(code: string) {
+    this.parseCode(code);
+  }
+
   prepare(code: string, _input: string) {
     this._ast = this.parseCode(code);
   }

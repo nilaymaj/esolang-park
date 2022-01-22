@@ -45,6 +45,9 @@ export type StepExecutionResult<RS> = {
  * execution and debugging API to the platform.
  */
 export interface LanguageEngine<RS> {
+  /** Validate the syntax of the given code. Throw ParseError if any */
+  validateCode: (code: string) => void;
+
   /** Load code and user input into the engine and prepare for execution */
   prepare: (code: string, input: string) => void;
 

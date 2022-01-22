@@ -36,6 +36,10 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
     this._input = DEFAULT_INPUT();
   }
 
+  validateCode(code: string) {
+    parseProgram(code);
+  }
+
   prepare(code: string, input: string) {
     this._ast = parseProgram(code);
     this._input = new InputStream(input);
