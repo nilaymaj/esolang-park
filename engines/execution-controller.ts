@@ -153,7 +153,7 @@ class ExecutionController<RS> {
           if (isRuntimeError(error)) {
             this._isPaused = true;
             resolve({
-              result: this._result!,
+              result: { ...this._result!, output: undefined },
               error: serializeRuntimeError(error),
             });
           } else reject(error);
