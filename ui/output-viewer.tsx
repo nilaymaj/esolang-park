@@ -43,7 +43,11 @@ const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
 
   return (
     <div style={{ padding: 10, fontSize: 16 }}>
-      <Text style={{ fontFamily: "monospace" }}>{value}</Text>
+      <pre
+        style={{ margin: 0, whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+      >
+        {value}
+      </pre>
       {value && <div style={{ height: 10 }} />}
       <Text style={{ fontFamily: "monospace", color: Colors.RED3 }}>
         {error}
