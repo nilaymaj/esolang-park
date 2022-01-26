@@ -1,5 +1,5 @@
 import monaco from "monaco-editor";
-import { DocumentRange } from "../../engines/types";
+import { DocumentEdit, DocumentRange } from "../../engines/types";
 import { WorkerParseError } from "../../engines/worker-errors";
 
 /** Type alias for an instance of Monaco editor */
@@ -57,6 +57,26 @@ export const createValidationMarker = (
     severity: monacoInstance.MarkerSeverity.Error,
     message: error.message,
     source: error.name,
+  };
+};
+
+/**
+ * Convert a DocumentEdit instance to Monaco edit object format.
+ * @param edit DocumentEdit to convert to Monaco format
+ * @returns Instance of Monaco's edit object
+ */
+export const createMonacoDocEdit = (
+  edit: DocumentEdit
+): monaco.editor.IIdentifiedSingleEditOperation => {
+  const location = get1IndexedLocation(edit.range);
+  return {
+    text: edit.text,
+    range: {
+      startLineNumber: location.line,
+      endLineNumber: location.line,
+      startColumn: location.charRange?.start || 0,
+      endColumn: location.charRange?.end || 1000,
+    },
   };
 };
 

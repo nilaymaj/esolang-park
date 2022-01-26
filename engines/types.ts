@@ -14,6 +14,14 @@ export type DocumentRange = {
   charRange?: CharRange;
 };
 
+/** Type denoting a document edit */
+export type DocumentEdit = {
+  /** Range to replace with the given text. Keep empty to insert text */
+  range: DocumentRange;
+  /** Text to replace the given range with */
+  text: string;
+};
+
 /** Source code token provider for the language, specific to Monaco */
 export type MonacoTokensProvider = monaco.languages.IMonarchLanguage;
 
@@ -29,6 +37,9 @@ export type StepExecutionResult<RS> = {
 
   /** String to write to program output */
   output?: string;
+
+  /** Self-modifying programs: edit to apply on code */
+  codeEdits?: DocumentEdit[];
 
   /**
    * Used to highlight next line to be executed in the editor.

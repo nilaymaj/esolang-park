@@ -1,9 +1,14 @@
 import React from "react";
 import Editor from "@monaco-editor/react";
 import { useEditorLanguageConfig } from "./use-editor-lang-config";
-import { DocumentRange, MonacoTokensProvider } from "../../engines/types";
+import {
+  DocumentEdit,
+  DocumentRange,
+  MonacoTokensProvider,
+} from "../../engines/types";
 import {
   createHighlightRange,
+  createMonacoDocEdit,
   EditorInstance,
   MonacoInstance,
 } from "./monaco-utils";
@@ -14,12 +19,26 @@ import { useDarkMode } from "../providers/dark-mode-provider";
 import { WorkerParseError } from "../../engines/worker-errors";
 import { useCodeValidator } from "./use-code-validator";
 
+/** Keeps track of user's original program and modifications done to it */
+type ChangeTrackerValue = {
+  /** The user's original program code */
+  original: string;
+  /** Tracks if code was modified during execution */
+  changed: boolean;
+};
+
 // Interface for interacting with the editor
 export interface CodeEditorRef {
   /** Get the current text content of the editor */
-  getValue: () => string;
+  getCode: () => string;
+  /** Update value of code */
+  editCode: (edits: DocumentEdit[]) => void;
   /** Update code highlights */
   updateHighlights: (highlights: DocumentRange | null) => void;
+  /** Start execution mode - readonly editor with modifyable contents */
+  startExecutionMode: () => void;
+  /** End execution mode - reset contents and readonly state */
+  endExecutionMode: () => void;
 }
 
 type Props = {
@@ -29,8 +48,6 @@ type Props = {
   defaultValue: string;
   /** Tokens provider for the language */
   tokensProvider?: MonacoTokensProvider;
-  /** Set editor as read-only */
-  readOnly?: boolean;
   /** Callback to validate code syntax */
   onValidateCode: (code: string) => Promise<WorkerParseError | undefined>;
   /** Callback to update debugging breakpoints */
@@ -44,8 +61,15 @@ type Props = {
 const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   const [editor, setEditor] = React.useState<EditorInstance | null>(null);
   const [monaco, setMonaco] = React.useState<MonacoInstance | null>(null);
+  const [readOnly, setReadOnly] = React.useState(false);
   const highlightRange = React.useRef<string[]>([]);
   const { isDark } = useDarkMode();
+
+  // Code modification tracker, used in execution mode
+  const changeTracker = React.useRef<ChangeTrackerValue>({
+    original: "",
+    changed: false,
+  });
 
   // Breakpoints
   useEditorBreakpoints({
@@ -89,8 +113,25 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
   React.useImperativeHandle(
     ref,
     () => ({
-      getValue: () => editor!.getValue(),
+      getCode: () => editor!.getValue(),
+      editCode: (edits) => {
+        changeTracker.current.changed = true;
+        const monacoEdits = edits.map(createMonacoDocEdit);
+        editor!.getModel()!.applyEdits(monacoEdits);
+      },
       updateHighlights,
+      startExecutionMode: () => {
+        changeTracker.current.original = editor!.getValue();
+        changeTracker.current.changed = false;
+        setReadOnly(true);
+      },
+      endExecutionMode: () => {
+        setReadOnly(false);
+        if (changeTracker.current.changed) {
+          editor!.getModel()!.setValue(changeTracker.current.original);
+          changeTracker.current.changed = false;
+        }
+      },
     }),
     [editor]
   );
@@ -112,7 +153,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
       options={{
         minimap: { enabled: false },
         glyphMargin: true,
-        readOnly: props.readOnly,
+        readOnly: readOnly,
       }}
     />
   );

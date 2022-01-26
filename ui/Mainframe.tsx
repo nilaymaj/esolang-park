@@ -44,6 +44,15 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     rendererRef.current!.updateState(result.rendererState);
     codeEditorRef.current!.updateHighlights(result.nextStepLocation);
     outputEditorRef.current!.append(result.output);
+
+    // Self-modifying programs: update code
+    if (result.codeEdits != null)
+      codeEditorRef.current!.editCode(result.codeEdits);
+
+    // End of program: reset code to original version
+    if (!result.nextStepLocation) codeEditorRef.current!.endExecutionMode();
+
+    // RuntimeError: print error to output
     if (error) outputEditorRef.current!.setError(error);
   };
 
@@ -60,13 +69,16 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     outputEditorRef.current!.reset();
     await execController.resetState();
     const error = await execController.prepare(
-      codeEditorRef.current!.getValue(),
+      codeEditorRef.current!.getCode(),
       inputEditorRef.current!.getValue()
     );
 
     // Check for ParseError, else begin execution
     if (error) outputEditorRef.current!.setError(error);
-    else await execController.execute(updateWithResult, execInterval);
+    else {
+      codeEditorRef.current!.startExecutionMode();
+      await execController.execute(updateWithResult, execInterval);
+    }
   };
 
   /** Pause the ongoing execution */
@@ -120,6 +132,7 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
     await execController.resetState();
     rendererRef.current!.updateState(null);
     codeEditorRef.current!.updateHighlights(null);
+    codeEditorRef.current!.endExecutionMode();
   };
 
   /** Translate execution controller state to debug controls state */
@@ -137,7 +150,6 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
         <CodeEditor
           ref={codeEditorRef}
           languageId={langName}
-          readOnly={execController.state === "processing"}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
           onValidateCode={execController.validateCode}
