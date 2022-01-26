@@ -1,4 +1,6 @@
 import { Button, Card, Icon } from "@blueprintjs/core";
+import Image from "next/image";
+import logoImg from "./assets/logo.png";
 import { GitHubIcon } from "./custom-icons";
 import { useDarkMode } from "./providers/dark-mode-provider";
 
@@ -7,8 +9,11 @@ export const Header = ({ langName }: { langName: string }) => {
 
   const brandSection = (
     <div style={{ flex: 1, textAlign: "left" }}>
-      <Button minimal large icon={<Icon icon="code-block" intent="primary" />}>
-        Esolang Park
+      <Button minimal large>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Image src={logoImg} width={20} height={20} />
+          <span style={{ marginLeft: 10 }}>Esolang Park</span>
+        </div>
       </Button>
     </div>
   );
