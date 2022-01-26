@@ -1,7 +1,13 @@
 import InputStream from "./input-stream";
-import { DocumentRange, LanguageEngine, StepExecutionResult } from "../types";
+import {
+  DocumentEdit,
+  DocumentRange,
+  LanguageEngine,
+  StepExecutionResult,
+} from "../types";
 import { ParseError, RuntimeError } from "../worker-errors";
 import { Bfg93RS, Bfg93Op, Bfg93Direction } from "./constants";
+import { toSafePrintableChar } from "../engine-utils";
 
 const ROWSIZE = 80; // Maximum size of a single grid row
 const COLSIZE = 25; // Maximum size of a single grid column
@@ -50,6 +56,7 @@ export default class Befunge93LanguageEngine
   private _strmode: boolean = DEFAULT_STR_MODE;
   private _bounds: CodeBounds = DEFAULT_BOUNDS();
   private _input: InputStream = new InputStream("");
+  private _edits: DocumentEdit[] = [];
 
   resetState() {
     this._ast = DEFAULT_AST();
@@ -59,6 +66,7 @@ export default class Befunge93LanguageEngine
     this._strmode = DEFAULT_STR_MODE;
     this._bounds = DEFAULT_BOUNDS();
     this._input = new InputStream("");
+    this._edits = [];
   }
 
   validateCode(code: string) {
@@ -67,18 +75,22 @@ export default class Befunge93LanguageEngine
 
   prepare(code: string, input: string) {
     this._ast = this.parseCode(code);
+    this._edits = this.getGridPaddingEdits(code);
     this._input = new InputStream(input);
   }
 
   executeStep(): StepExecutionResult<Bfg93RS> {
     // Execute and update program counter
     let output: string | undefined = undefined;
+    let edits: DocumentEdit[] | undefined = undefined;
     let end: boolean = false;
     if (this._pc.x === -1 && this._pc.y === -1) {
       this._pc = { x: 0, y: 0 };
+      edits = this._edits;
     } else {
       const result = this.processOp();
       output = result.output;
+      edits = result.edit && [result.edit];
       end = !!result.end;
     }
 
@@ -92,7 +104,7 @@ export default class Befunge93LanguageEngine
       direction: this._dirn,
       strMode: this._strmode,
     };
-    return { rendererState, nextStepLocation, output };
+    return { rendererState, nextStepLocation, output, codeEdits: edits };
   }
 
   private parseCode(code: string) {
@@ -133,7 +145,7 @@ export default class Befunge93LanguageEngine
    * Also updates stack and pointer states.
    * @returns String to append to output, if any
    */
-  private processOp(): { output?: string; end?: boolean } {
+  private processOp(): { output?: string; end?: boolean; edit?: DocumentEdit } {
     const char = this.getGridCell(this._pc.x, this._pc.y);
     if (this._strmode && char !== '"') {
       // Push character to string and return;
@@ -143,6 +155,7 @@ export default class Befunge93LanguageEngine
     }
 
     let output: string | undefined = undefined;
+    let edit: DocumentEdit | undefined = undefined;
     let end: boolean = false;
 
     const op = this.charToOp(char);
@@ -275,7 +288,7 @@ export default class Befunge93LanguageEngine
         const y = this.popStack();
         const x = this.popStack();
         const charCode = this.popStack();
-        this.setGridCell(x, y, charCode);
+        edit = this.setGridCell(x, y, charCode);
         break;
       }
       case Bfg93Op.STDIN_INT: {
@@ -299,7 +312,7 @@ export default class Befunge93LanguageEngine
 
     // Update grid pointer and return
     this.updatePointer();
-    return { output, end };
+    return { output, end, edit };
   }
 
   /** Push a number onto the stack */
@@ -327,7 +340,7 @@ export default class Befunge93LanguageEngine
    * Set cell at (x, y) of program grid to character with given ASCII value.
    * Throws if (x, y) is out of bounds
    */
-  private setGridCell(x: number, y: number, asciiVal: number): void {
+  private setGridCell(x: number, y: number, asciiVal: number): DocumentEdit {
     if (!this.isInGrid(x, y))
       throw new RuntimeError("Coordinates out of bound");
 
@@ -340,6 +353,12 @@ export default class Befunge93LanguageEngine
     // Update grid bounds
     this._bounds.x[y] = Math.max(this._bounds.x[y], x);
     this._bounds.y[x] = Math.max(this._bounds.y[x], y);
+
+    // Return code edit object
+    return {
+      text: toSafePrintableChar(asciiVal),
+      range: { line: y, charRange: { start: x, end: x + 1 } },
+    };
   }
 
   /**
@@ -381,6 +400,36 @@ export default class Befunge93LanguageEngine
       if (this._pc.y < 0) this._pc.y = this._bounds.y[this._pc.x];
       else if (this._pc.y > this._bounds.y[this._pc.x]) this._pc.y = 0;
     }
+  }
+
+  /**
+   * Generate `DocumentEdit`s to apply on code to pad it up to 80x25 size.
+   * @param code Code content, lines separated by '\n'
+   * @returns Array of `DocumentEdit`s to apply on code
+   */
+  private getGridPaddingEdits(code: string): DocumentEdit[] {
+    const lines = code.split("\n");
+    const edits: DocumentEdit[] = [];
+    for (let i = 0; i < COLSIZE; ++i) {
+      if (i < lines.length) {
+        if (lines[i].length === ROWSIZE) continue;
+        // Add padding to line upto full-length
+        edits.push({
+          range: {
+            line: i,
+            charRange: { start: lines[i].length, end: lines[i].length },
+          },
+          text: " ".repeat(ROWSIZE - lines[i].length),
+        });
+      } else {
+        // Add full-length empty line
+        edits.push({
+          range: { line: i, charRange: { start: 0, end: 0 } },
+          text: "\n" + " ".repeat(80),
+        });
+      }
+    }
+    return edits;
   }
 
   /**

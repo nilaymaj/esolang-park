@@ -154,6 +154,9 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
         minimap: { enabled: false },
         glyphMargin: true,
         readOnly: readOnly,
+        // Self-modifying programs may add control characters to the code.
+        // This option ensures such characters are properly displayed.
+        renderControlCharacters: true,
       }}
     />
   );
