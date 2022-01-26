@@ -5,12 +5,15 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "react-mosaic-component/react-mosaic-component.css";
 import type { AppProps } from "next/app";
 import { DarkModeProvider } from "../ui/providers/dark-mode-provider";
+import { ErrorBoundaryProvider } from "../ui/providers/error-boundary-provider";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <DarkModeProvider>
-      <Component {...pageProps} />
-    </DarkModeProvider>
+    <ErrorBoundaryProvider>
+      <DarkModeProvider>
+        <Component {...pageProps} />
+      </DarkModeProvider>
+    </ErrorBoundaryProvider>
   );
 }
 

@@ -30,7 +30,7 @@ const resultMessage = <RS, A extends C.WorkerAckType>(
 
 /** Create a worker response for unexpected errors */
 const errorMessage = <RS, A extends C.WorkerAckType>(
-  error: Error
+  error: E.WorkerError
 ): C.WorkerResponseData<RS, A> => ({ type: "error", error });
 
 /** Initialize the execution controller */
@@ -129,15 +129,16 @@ export const setupWorker = <RS>(engine: LanguageEngine<RS>) => {
       if (ev.data.type === "ValidateCode")
         return validateCode(controller, ev.data.params.code);
       if (ev.data.type === "Execute")
-        return execute(controller, ev.data.params.interval);
+        return await execute(controller, ev.data.params.interval);
       if (ev.data.type === "Pause") return await pauseExecution(controller);
       if (ev.data.type === "ExecuteStep") return executeStep(controller);
       if (ev.data.type === "UpdateBreakpoints")
         return updateBreakpoints(controller, ev.data.params.points);
     } catch (error) {
       // Error here indicates an implementation bug
-      console.error(error);
-      postMessage(errorMessage(error as Error));
+      const err = error as Error;
+      postMessage(errorMessage(E.serializeError(err)));
+      return;
     }
     throw new Error("Invalid worker message type");
   });

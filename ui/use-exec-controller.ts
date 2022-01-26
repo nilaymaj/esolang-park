@@ -5,6 +5,7 @@ import {
   WorkerResponseData,
 } from "../engines/worker-constants";
 import { WorkerParseError, WorkerRuntimeError } from "../engines/worker-errors";
+import { useErrorBoundary } from "./providers/error-boundary-provider";
 
 /** Possible states for the worker to be in */
 type WorkerState =
@@ -26,6 +27,7 @@ type WorkerState =
 export const useExecController = <RS>(langName: string) => {
   const workerRef = React.useRef<Worker | null>(null);
   const [workerState, setWorkerState] = React.useState<WorkerState>("loading");
+  const errorBoundary = useErrorBoundary();
 
   /**
    * Type-safe wrapper to abstract request-response cycle into
@@ -77,6 +79,20 @@ export const useExecController = <RS>(langName: string) => {
     (async () => {
       if (workerRef.current) throw new Error("Tried to reinitialize worker");
       workerRef.current = new Worker(`../workers/${langName}.js`);
+      // Add event listener for bubbling errors to main thread
+      workerRef.current.addEventListener(
+        "message",
+        (event: MessageEvent<WorkerResponseData<RS, any>>) => {
+          if (event.data.type !== "error") return;
+          const plainError = event.data.error;
+          const err = new Error(
+            `[Worker] ${plainError.name}: ${plainError.message}`
+          );
+          err.stack = event.data.error.stack;
+          errorBoundary.throwError(err);
+          // throw err;
+        }
+      );
       const res = await requestWorker({ type: "Init" });
       if (res.type === "ack" && res.data === "init") setWorkerState("empty");
       else throwUnexpectedRes("init", res);

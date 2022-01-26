@@ -73,4 +73,4 @@ export type WorkerResponseData<RS, A extends WorkerAckType> =
       error?: E.WorkerRuntimeError;
     }
   /** Response indicating a bug in worker/engine logic */
-  | { type: "error"; error: Error };
+  | { type: "error"; error: E.WorkerError };

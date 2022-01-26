@@ -58,6 +58,13 @@ export type WorkerRuntimeError = {
   message: string;
 };
 
+/** Error sent by worker indicating an implementation bug */
+export type WorkerError = {
+  name: string;
+  message: string;
+  stack?: string;
+};
+
 /** Serialize a RuntimeError instance into a plain object */
 export const serializeRuntimeError = (
   error: RuntimeError
@@ -68,4 +75,9 @@ export const serializeRuntimeError = (
 /** Serialize a ParseError instance into a plain object */
 export const serializeParseError = (error: ParseError): WorkerParseError => {
   return { name: "ParseError", message: error.message, range: error.range };
+};
+
+/** Serialize an arbitrary error into a plain object */
+export const serializeError = (error: Error): WorkerError => {
+  return { name: error.name, message: error.message, stack: error.stack };
 };
