@@ -1,14 +1,14 @@
 const path = require("path");
 const fs = require("fs");
 
-const langNames = fs.readdirSync("engines").filter((name) => {
-  const stats = fs.statSync(`./engines/${name}`);
+const langNames = fs.readdirSync("languages").filter((name) => {
+  const stats = fs.statSync(`./languages/${name}`);
   return stats.isDirectory();
 });
 
 const entryPoints = {};
 for (const lang of langNames) {
-  entryPoints[lang] = `./engines/${lang}/engine.ts`;
+  entryPoints[lang] = `./languages/${lang}/engine.ts`;
 }
 
 console.log(path.resolve(__dirname, "worker-pack/tsconfig.json"));

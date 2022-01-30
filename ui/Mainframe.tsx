@@ -3,11 +3,11 @@ import { CodeEditor, CodeEditorRef } from "../ui/code-editor";
 import { InputEditor, InputEditorRef } from "../ui/input-editor";
 import { MainLayout } from "../ui/MainLayout";
 import { useExecController } from "../ui/use-exec-controller";
-import { LanguageProvider, StepExecutionResult } from "../engines/types";
+import { LanguageProvider, StepExecutionResult } from "../languages/types";
 import { OutputViewer, OutputViewerRef } from "../ui/output-viewer";
 import { ExecutionControls } from "./execution-controls";
 import { RendererRef, RendererWrapper } from "./renderer-wrapper";
-import { WorkerRuntimeError } from "../engines/worker-errors";
+import { WorkerRuntimeError } from "../languages/worker-errors";
 
 type Props<RS> = {
   langName: string;

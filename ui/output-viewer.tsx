@@ -1,6 +1,9 @@
 import React from "react";
 import { Colors, Text } from "@blueprintjs/core";
-import { WorkerParseError, WorkerRuntimeError } from "../engines/worker-errors";
+import {
+  WorkerParseError,
+  WorkerRuntimeError,
+} from "../languages/worker-errors";
 
 /** Format a ParseError for displaying as output */
 const formatParseError = (error: WorkerParseError): string => {

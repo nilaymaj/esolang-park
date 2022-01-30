@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import { Header } from "../../ui/header";
-import LangProvider from "../../engines/befunge93";
+import LangProvider from "../../languages/befunge93";
 const LANG_ID = "befunge93";
 const LANG_NAME = "Befunge-93";
 

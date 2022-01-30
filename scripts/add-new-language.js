@@ -14,7 +14,7 @@ if (!langId || !langName) {
 }
 
 // Check if language provider directory already exists
-const dir = path.resolve(__dirname, "../engines/", langId);
+const dir = path.resolve(__dirname, "../languages/", langId);
 if (fs.existsSync(dir)) {
   console.log(`Language ID '${langId}' already exists.`);
   process.exit(0);

@@ -1,6 +1,6 @@
 import monaco from "monaco-editor";
-import { DocumentEdit, DocumentRange } from "../../engines/types";
-import { WorkerParseError } from "../../engines/worker-errors";
+import { DocumentEdit, DocumentRange } from "../../languages/types";
+import { WorkerParseError } from "../../languages/worker-errors";
 
 /** Type alias for an instance of Monaco editor */
 export type EditorInstance = monaco.editor.IStandaloneCodeEditor;

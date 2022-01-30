@@ -1,5 +1,5 @@
 import React from "react";
-import { LanguageProvider } from "../engines/types";
+import { LanguageProvider } from "../languages/types";
 
 export interface RendererRef<RS> {
   /** Update runtime state to renderer */

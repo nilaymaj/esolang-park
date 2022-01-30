@@ -1,5 +1,5 @@
 import * as React from "react";
-import { WorkerParseError } from "../../engines/worker-errors";
+import { WorkerParseError } from "../../languages/worker-errors";
 import {
   createValidationMarker,
   EditorInstance,

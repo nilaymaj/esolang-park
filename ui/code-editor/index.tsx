@@ -5,7 +5,7 @@ import {
   DocumentEdit,
   DocumentRange,
   MonacoTokensProvider,
-} from "../../engines/types";
+} from "../../languages/types";
 import {
   createHighlightRange,
   createMonacoDocEdit,
@@ -16,7 +16,7 @@ import { useEditorBreakpoints } from "./use-editor-breakpoints";
 import darkTheme from "./themes/dark.json";
 import lightTheme from "./themes/light.json";
 import { useDarkMode } from "../providers/dark-mode-provider";
-import { WorkerParseError } from "../../engines/worker-errors";
+import { WorkerParseError } from "../../languages/worker-errors";
 import { useCodeValidator } from "./use-code-validator";
 
 /** Keeps track of user's original program and modifications done to it */

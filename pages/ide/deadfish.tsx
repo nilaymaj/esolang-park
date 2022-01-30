@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import { Header } from "../../ui/header";
-import LangProvider from "../../engines/deadfish";
+import LangProvider from "../../languages/deadfish";
 const LANG_ID = "deadfish";
 const LANG_NAME = "Deadfish";
 

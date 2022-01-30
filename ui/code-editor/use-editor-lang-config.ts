@@ -1,6 +1,6 @@
 import React from "react";
 import { useMonaco } from "@monaco-editor/react";
-import { MonacoTokensProvider } from "../../engines/types";
+import { MonacoTokensProvider } from "../../languages/types";
 
 type ConfigParams = {
   languageId: string;

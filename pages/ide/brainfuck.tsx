@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import { Header } from "../../ui/header";
-import LangProvider from "../../engines/brainfuck";
+import LangProvider from "../../languages/brainfuck";
 const LANG_ID = "brainfuck";
 const LANG_NAME = "Brainfuck";
 
