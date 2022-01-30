@@ -6,13 +6,7 @@ import Image from "next/image";
 import { Card, Colors, Text } from "@blueprintjs/core";
 import Link from "next/link";
 import { useDarkMode } from "../ui/providers/dark-mode-provider";
-
-const LANGUAGES = [
-  { display: "Befunge-93", id: "befunge93" },
-  { display: "Brainf*ck", id: "brainfuck" },
-  { display: "Chef", id: "chef" },
-  { display: "Deadfish", id: "deadfish" },
-];
+import LANGUAGES from "./languages.json";
 
 const styles = {
   rootContainer: {
@@ -56,7 +50,7 @@ const Index: NextPage = () => {
       <div style={{ ...styles.rootContainer, backgroundColor }}>
         <div style={styles.headerContainer}>
           <div style={{ flexGrow: 0, marginRight: 10 }}>
-            <Image src={logoImg} width={52} height={52} />
+            <Image src={logoImg} alt="logo" width={52} height={52} />
           </div>
           <Text tagName="div">
             <h1>Esolang Park</h1>

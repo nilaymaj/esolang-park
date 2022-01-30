@@ -1,0 +1,18 @@
+[
+  {
+    "display": "Befunge-93",
+    "id": "befunge93"
+  },
+  {
+    "display": "Brainf*ck",
+    "id": "brainfuck"
+  },
+  {
+    "display": "Chef",
+    "id": "chef"
+  },
+  {
+    "display": "Deadfish",
+    "id": "deadfish"
+  }
+]

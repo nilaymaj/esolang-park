@@ -11,7 +11,7 @@ export const Header = ({ langName }: { langName: string }) => {
     <div style={{ flex: 1, textAlign: "left" }}>
       <Button minimal large>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Image src={logoImg} width={20} height={20} />
+          <Image src={logoImg} alt="logo" width={20} height={20} />
           <span style={{ marginLeft: 10 }}>Esolang Park</span>
         </div>
       </Button>
