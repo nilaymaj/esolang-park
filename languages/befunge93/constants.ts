@@ -75,5 +75,5 @@ export const editorTokensProvider: MonacoTokensProvider = {
       [/[&~0-9]/, "turquoise"],
     ],
   },
-  defaultToken: "comment",
+  defaultToken: "plain",
 };

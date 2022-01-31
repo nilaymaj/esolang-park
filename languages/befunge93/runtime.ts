@@ -74,7 +74,9 @@ export default class Befunge93LanguageEngine
   }
 
   prepare(code: string, input: string) {
-    this._ast = this.parseCode(code);
+    const { grid, bounds } = this.parseCode(code);
+    this._ast = grid;
+    this._bounds = bounds;
     this._edits = this.getGridPaddingEdits(code);
     this._input = new InputStream(input);
   }
@@ -130,14 +132,14 @@ export default class Befunge93LanguageEngine
     const maxY = lines.length - 1;
 
     // Define bounds for each line and column
-    for (let i = 0; i < COLSIZE; ++i)
-      this._bounds.x[i] = lines[i]?.length - 1 || -1;
-    for (let j = 0; j < ROWSIZE; ++j) this._bounds.y[j] = j <= maxX ? maxY : -1;
+    const bounds = DEFAULT_BOUNDS();
+    for (let i = 0; i < COLSIZE; ++i) bounds.x[i] = lines[i]?.length - 1 || -1;
+    for (let j = 0; j < ROWSIZE; ++j) bounds.y[j] = j <= maxX ? maxY : -1;
 
     // Pad the program to size 80x25 for execution
     const grid = lines.map((line) => line.padEnd(80, " "));
     grid.push(...new Array(25 - lines.length).fill(" ".repeat(80)));
-    return grid;
+    return { grid, bounds };
   }
 
   /**
