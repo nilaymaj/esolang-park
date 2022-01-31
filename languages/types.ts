@@ -2,15 +2,19 @@ import monaco from "monaco-editor";
 import React from "react";
 
 /**
- * Type alias for defining range of characters to highlight in a single line.
- * - Missing `start` means highlight starting from start of the line.
- * - Missing `end` means highlight ending at the end of the line.
+ * Type alias for defining range of characters in a single line.
+ * - Missing `start` means range starting from start of the line.
+ * - Missing `end` means range ending at the end of the line.
  */
 export type CharRange = { start?: number; end?: number };
 
-/** Type denoting a range of text in document spanning within a line */
+/**
+ * Type denoting a range of text in document spanning within a line.
+ */
 export type DocumentRange = {
+  /** Line number of the range */
   line: number;
+  /** Section of line - omit to cover entire line */
   charRange?: CharRange;
 };
 
@@ -47,7 +51,7 @@ export type StepExecutionResult<RS> = {
    */
   nextStepLocation: DocumentRange | null;
 
-  /** Signal if execution has been paused/stopped */
+  /** Signal if execution has been paused */
   signal?: "paused";
 };
 

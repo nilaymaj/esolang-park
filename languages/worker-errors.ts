@@ -45,39 +45,57 @@ export const isRuntimeError = (error: any): error is RuntimeError => {
   return error instanceof RuntimeError || error.name === "RuntimeError";
 };
 
-/** Error sent by worker in case of parsing error */
+/**
+ * Error sent by worker in case of parsing error.
+ * Not for use by language providers.
+ */
 export type WorkerParseError = {
   name: "ParseError";
   message: string;
   range: DocumentRange;
 };
 
-/** Error sent by worker in case error at runtime */
+/**
+ * Error sent by worker in case error at runtime.
+ * Not for use by language providers.
+ */
 export type WorkerRuntimeError = {
   name: "RuntimeError";
   message: string;
 };
 
-/** Error sent by worker indicating an implementation bug */
+/**
+ * Error sent by worker indicating an implementation bug.
+ * Not for use by language providers.
+ */
 export type WorkerError = {
   name: string;
   message: string;
   stack?: string;
 };
 
-/** Serialize a RuntimeError instance into a plain object */
+/**
+ * Serialize a RuntimeError instance into a plain object.
+ * Not for use by language providers.
+ */
 export const serializeRuntimeError = (
   error: RuntimeError
 ): WorkerRuntimeError => {
   return { name: "RuntimeError", message: error.message };
 };
 
-/** Serialize a ParseError instance into a plain object */
+/**
+ * Serialize a ParseError instance into a plain object.
+ * Not for use by language providers.
+ */
 export const serializeParseError = (error: ParseError): WorkerParseError => {
   return { name: "ParseError", message: error.message, range: error.range };
 };
 
-/** Serialize an arbitrary error into a plain object */
+/**
+ * Serialize an arbitrary error into a plain object.
+ * Not for use by language providers.
+ */
 export const serializeError = (error: Error): WorkerError => {
   return { name: error.name, message: error.message, stack: error.stack };
 };
