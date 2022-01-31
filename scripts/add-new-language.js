@@ -39,7 +39,7 @@ const copyFile = (src, dest) => {
 };
 
 {
-  // Copy language provider template files
+  // Copy language provider template files (except the README)
   ["index.ts", "common.ts", "runtime.ts", "engine.ts", "renderer.tsx"].forEach(
     (filename) => {
       const srcPath = path.resolve(__dirname, `new-lang-template/${filename}`);
@@ -47,6 +47,15 @@ const copyFile = (src, dest) => {
       copyFile(srcPath, destPath);
     }
   );
+}
+
+{
+  // Copy the language provider README file
+  const src = path.resolve(__dirname, "./new-lang-template/README.md");
+  const dest = path.resolve(dir, "README.md");
+  const contents = fs.readFileSync(src).toString();
+  const finalContents = contents.replace("$LANG_NAME", langName);
+  fs.writeFileSync(dest, finalContents);
 }
 
 {

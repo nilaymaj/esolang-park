@@ -1,8 +1,9 @@
 # Deadfish
 
-## Allowed symbols
+## References
 
-- `i`: Increment value by 1
-- `d`: Decrement value by 1
-- `s`: Square the value
-- `o`: Output the value
+- Esolangs wiki: https://esolangs.org/wiki/Deadfish
+
+## Implementation details
+
+- The value is unbounded, but is reset to `0` whenever it equals `-1` or `256`.
