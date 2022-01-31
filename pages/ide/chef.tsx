@@ -14,7 +14,7 @@ const IDE: NextPage = () => {
         <title>{LANG_NAME} | Esolang Park</title>
       </Head>
       <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <Header langName={LANG_NAME} />
+        <Header langId={LANG_ID} langName={LANG_NAME} />
         <div style={{ flexGrow: 1 }}>
           <Mainframe langName={LANG_ID} provider={LangProvider} />
         </div>
