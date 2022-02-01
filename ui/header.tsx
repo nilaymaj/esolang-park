@@ -33,7 +33,7 @@ export const Header = (props: { langId: string; langName: string }) => {
     <div style={{ flex: 1, textAlign: "right", paddingRight: 8 }}>
       <a
         href={NOTES_LINK(props.langId)}
-        title="View implementatio notes for this esolang"
+        title="View implementation notes for this esolang"
       >
         <Button minimal icon={<Icon icon="info-sign" />} />
       </a>
