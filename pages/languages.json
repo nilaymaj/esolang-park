@@ -14,5 +14,9 @@
   {
     "display": "Deadfish",
     "id": "deadfish"
+  },
+  {
+    "display": "Rockstar",
+    "id": "rockstar"
   }
 ]

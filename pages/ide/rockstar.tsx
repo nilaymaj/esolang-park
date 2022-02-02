@@ -4,9 +4,9 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import { Header } from "../../ui/header";
-import LangProvider from "../../languages/$LANG_ID";
+import LangProvider from "../../languages/rockstar";
 const LANG_ID = "$LANG_ID";
-const LANG_NAME = "$LANG_NAME";
+const LANG_NAME = "Rockstar";
 
 const IDE: NextPage = () => {
   return (
