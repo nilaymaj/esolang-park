@@ -15,10 +15,11 @@ const styles = {
   },
   inputWrapper: {
     /**
-     * As of Dec'21, NumericInput doesn't have `small` prop yet,
-     * so we instead use `transform` to hack up a smaller input.
+     * As of Feb'22, NumericInput doesn't have `small` prop yet,
+     * so we instead use `transform` to hack up a slightly smaller input.
      */
-    transform: "scale(0.8)",
+    transform: "scale(0.9)",
+    marginLeft: 10,
   },
   input: {
     width: 125,
@@ -44,6 +45,7 @@ const IntervalInput = (props: {
         clampValueOnBlur
         style={styles.input}
         disabled={props.disabled}
+        title="Adjust the execution interval"
         onValueChange={(v) => props.onChange(v)}
         rightElement={<Tag minimal>ms</Tag>}
         allowNumericCharactersOnly
@@ -55,9 +57,11 @@ const IntervalInput = (props: {
 /** Button for starting code execution */
 const RunButton = ({ onClick }: { onClick: () => void }) => (
   <Button
-    small
+    outlined
+    intent="success"
     onClick={onClick}
     rightIcon={<Icon icon="play" intent="success" />}
+    title="Run your code"
   >
     Run code
   </Button>
@@ -78,21 +82,24 @@ const DebugControls = (props: {
   return (
     <ButtonGroup>
       <Button
-        small
-        title={paused ? "Pause" : "Resume"}
+        outlined
+        intent="primary"
+        title={paused ? "Resume" : "Pause"}
         disabled={pauseDisabled}
         onClick={paused ? props.onResume : props.onPause}
         icon={<Icon icon={paused ? "play" : "pause"} intent="primary" />}
       />
       <Button
-        small
+        outlined
+        intent="warning"
         title="Step"
         onClick={props.onStep}
         disabled={stepDisabled}
         icon={<Icon icon="step-forward" intent="warning" />}
       />
       <Button
-        small
+        outlined
+        intent="danger"
         title="Stop"
         onClick={props.onStop}
         icon={<Icon icon="stop" intent="danger" />}

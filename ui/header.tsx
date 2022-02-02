@@ -1,8 +1,8 @@
-import { Button, Card, Icon } from "@blueprintjs/core";
 import Image from "next/image";
 import logoImg from "./assets/logo.png";
 import { GitHubIcon } from "./custom-icons";
 import { useDarkMode } from "./providers/dark-mode-provider";
+import { Button, Card, Icon, Tag } from "@blueprintjs/core";
 
 /** Link to the project's GitHub repository */
 const REPO_LINK = "https://github.com/nilaymaj/esolang-park";
@@ -11,22 +11,38 @@ const REPO_LINK = "https://github.com/nilaymaj/esolang-park";
 const NOTES_LINK = (id: string) =>
   `https://github.com/nilaymaj/esolang-park/blob/main/languages/${id}/README.md`;
 
-export const Header = (props: { langId: string; langName: string }) => {
+type Props = {
+  langId: string;
+  langName: string;
+  renderExecControls: () => React.ReactNode;
+};
+
+export const Header = (props: Props) => {
   const DarkMode = useDarkMode();
 
   const brandSection = (
-    <div style={{ flex: 1, textAlign: "left" }}>
+    <div
+      style={{
+        flex: 1,
+        textAlign: "left",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
       <Button minimal large>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Image src={logoImg} alt="logo" width={20} height={20} />
           <span style={{ marginLeft: 10 }}>Esolang Park</span>
         </div>
       </Button>
+      <Tag large minimal style={{ marginLeft: 10 }}>
+        {props.langName}
+      </Tag>
     </div>
   );
 
-  const langSection = (
-    <div style={{ flex: 0, textAlign: "center" }}>{props.langName}</div>
+  const controlsSection = (
+    <div style={{ textAlign: "center" }}>{props.renderExecControls()}</div>
   );
 
   const infoSection = (
@@ -60,7 +76,7 @@ export const Header = (props: { langId: string; langName: string }) => {
         }}
       >
         {brandSection}
-        {langSection}
+        {controlsSection}
         {infoSection}
       </Card>
     </div>

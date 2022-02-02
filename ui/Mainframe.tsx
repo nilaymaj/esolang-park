@@ -10,6 +10,7 @@ import { RendererRef, RendererWrapper } from "./renderer-wrapper";
 import { WorkerRuntimeError } from "../languages/worker-errors";
 
 type Props<RS> = {
+  langId: string;
   langName: string;
   provider: LanguageProvider<RS>;
 };
@@ -22,10 +23,10 @@ type Props<RS> = {
  * small execution intervals if rendered on every execution. All state management
  * is delegated to imperatively controlled child components.
  */
-export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
+export const Mainframe = <RS extends {}>(props: Props<RS>) => {
   // Language provider and engine
-  const providerRef = React.useRef(provider);
-  const execController = useExecController(langName);
+  const providerRef = React.useRef(props.provider);
+  const execController = useExecController(props.langId);
 
   // Refs for controlling UI components
   const codeEditorRef = React.useRef<CodeEditorRef>(null);
@@ -146,10 +147,12 @@ export const Mainframe = <RS extends {}>({ langName, provider }: Props<RS>) => {
 
   return (
     <MainLayout
+      langId={props.langId}
+      langName={props.langName}
       renderEditor={() => (
         <CodeEditor
           ref={codeEditorRef}
-          languageId={langName}
+          languageId={props.langName}
           defaultValue={providerRef.current.sampleProgram}
           tokensProvider={providerRef.current.editorTokensProvider}
           onValidateCode={execController.validateCode}
