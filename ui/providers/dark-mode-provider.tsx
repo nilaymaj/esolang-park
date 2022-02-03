@@ -29,7 +29,7 @@ export const DarkModeProvider = ({
           height: "100%",
           backgroundColor: isDark ? Colors.DARK_GRAY2 : Colors.GRAY4,
         }}
-        className={isDark ? "bp3-dark" : ""}
+        className={isDark ? "bp4-dark" : ""}
       >
         {children}
       </div>

@@ -74,71 +74,22 @@
     "selection.background": "#0E5A8A"
   },
   "rules": [
-    {
-      "foreground": "#202B33",
-      "token": "plain"
-    },
-    {
-      "foreground": "#137CBD",
-      "token": "blue"
-    },
-    {
-      "foreground": "#0F9960",
-      "token": "green"
-    },
-    {
-      "foreground": "#D9822B",
-      "token": "orange"
-    },
-    {
-      "foreground": "#DB3737",
-      "token": "red"
-    },
-    {
-      "foreground": "#D13913",
-      "token": "vermillion"
-    },
-    {
-      "foreground": "#DB2C6F",
-      "token": "rose"
-    },
-    {
-      "foreground": "#8F398F",
-      "token": "violet"
-    },
-    {
-      "foreground": "#7157D9",
-      "token": "indigo"
-    },
-    {
-      "foreground": "#2965CC",
-      "token": "cobalt"
-    },
-    {
-      "foreground": "#00B3A4",
-      "token": "turquoise"
-    },
-    {
-      "foreground": "#29A634",
-      "token": "forest"
-    },
-    {
-      "foreground": "#9BBF30",
-      "token": "lime"
-    },
-    {
-      "foreground": "#D99E0B",
-      "token": "gold"
-    },
-    {
-      "foreground": "#96622D",
-      "token": "sepia"
-    },
-    {
-      "foreground": "#5C7080",
-      "fontStyle": "italic",
-      "token": "comment"
-    }
+    { "foreground": "#1C2127", "token": "plain" },
+    { "foreground": "#2D72D2", "token": "blue" },
+    { "foreground": "#238551", "token": "green" },
+    { "foreground": "#C87619", "token": "orange" },
+    { "foreground": "#CD4246", "token": "red" },
+    { "foreground": "#D33D17", "token": "vermillion" },
+    { "foreground": "#DB2C6F", "token": "rose" },
+    { "foreground": "#9D3F9D", "token": "violet" },
+    { "foreground": "#7961DB", "token": "indigo" },
+    { "foreground": "#147EB3", "token": "cerulean" },
+    { "foreground": "#00A396", "token": "turquoise" },
+    { "foreground": "#29A634", "token": "forest" },
+    { "foreground": "#8EB125", "token": "lime" },
+    { "foreground": "#D1980B", "token": "gold" },
+    { "foreground": "#946638", "token": "sepia" },
+    { "foreground": "#5C7080", "fontStyle": "italic", "token": "comment" }
   ],
   "encodedTokensColors": []
 }

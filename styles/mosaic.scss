@@ -57,7 +57,7 @@
       .separator {
         border-left: 1px solid $light-gray2;
       }
-      .bp3-button {
+      .bp4-button {
         &,
         &:before {
           color: $gray2;
@@ -80,7 +80,7 @@
       transition: height 250ms;
       box-shadow: 0 1px 1px $pt-divider-black;
 
-      .bp3-button {
+      .bp4-button {
         &,
         &:before {
           color: $gray2;
@@ -103,7 +103,7 @@
     }
   }
 
-  &.bp3-dark {
+  &.bp4-dark {
     background: $dark-gray2;
 
     .mosaic-zero-state {
@@ -148,7 +148,7 @@
         .separator {
           border-color: $gray1;
         }
-        .bp3-button {
+        .bp4-button {
           &,
           &:before {
             color: $gray4;
@@ -161,7 +161,7 @@
       }
 
       .mosaic-window-additional-actions-bar {
-        .bp3-button {
+        .bp4-button {
           &,
           &:before {
             color: $gray5;

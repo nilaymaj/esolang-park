@@ -25,7 +25,7 @@ type Props = {
 
 export const MainLayout = (props: Props) => {
   const { isDark } = useDarkMode();
-  const mosaicClass = "mosaic-custom-theme" + (isDark ? " bp3-dark" : "");
+  const mosaicClass = "mosaic-custom-theme" + (isDark ? " bp4-dark" : "");
 
   const MOSAIC_MAP = {
     editor: props.renderEditor,
