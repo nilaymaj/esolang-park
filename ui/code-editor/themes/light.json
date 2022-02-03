@@ -88,8 +88,8 @@
     { "token": "tag", "foreground": "29A634", "note": "forest" },
     { "token": "meta", "foreground": "2D72D2", "note": "blue" },
     { "token": "key", "foreground": "CD4246", "note": "red" },
-    { "token": "attribute.name", "foreground": "CD4246", "note": "red" },
-    { "token": "attribute.value", "foreground": "D1980B", "note": "gold" },
+    { "token": "operators", "foreground": "147EB3", "note": "cerulean" },
+    { "token": "attribute", "foreground": "D1980B", "note": "gold" },
     { "token": "string", "foreground": "238551", "note": "green" },
     { "token": "keyword", "foreground": "9D3F9D", "note": "violet" },
     { "token": "comment", "foreground": "5F6B7C", "fontStyle": "italic" }
