@@ -27,10 +27,6 @@ const styles: { [k: string]: CSSProperties } = {
     justifyContent: "center",
     alignItems: "center",
   },
-  activeCell: {
-    background: "#CED9E0",
-    color: "#182026",
-  },
 };
 
 /** Component for displaying a single tape cell */

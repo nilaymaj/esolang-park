@@ -66,13 +66,13 @@ export const sampleProgram = [
 export const editorTokensProvider: MonacoTokensProvider = {
   tokenizer: {
     root: [
-      [/[\>\^<v\?]/, "red"],
-      [/[\+\-\*\/%!`]/, "orange"],
-      [/[|_]/, "blue"],
-      [/[":\\#]/, "green"],
-      [/[\$\.,]/, "violet"],
-      [/[gp@]/, "indigo"],
-      [/[&~0-9]/, "turquoise"],
+      [/[\>\^<v\?]/, "variable"],
+      [/[\+\-\*\/%!`]/, "operators"],
+      [/[|_]/, "meta"],
+      [/[":\\#]/, "tag"],
+      [/[\$\.,]/, "keyword"],
+      [/[gp@]/, "attribute"],
+      [/[&~0-9]/, "string"],
     ],
   },
   defaultToken: "plain",

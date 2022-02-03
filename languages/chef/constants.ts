@@ -17,7 +17,8 @@ export const isSyntaxError = (error: any): error is SyntaxError => {
 export const sampleProgram = [
   "Hello World Souffle.",
   "",
-  'This recipe prints the immortal words "Hello world!", in a basically brute force way. It also makes a lot of food for one person.',
+  'This recipe prints the immortal words "Hello world!", in a basically ',
+  "brute force way. It also makes a lot of food for one person.",
   "",
   "Ingredients.",
   "72 g haricot beans",
@@ -49,15 +50,37 @@ export const sampleProgram = [
   "Serves 1.",
 ].join("\n");
 
+/** Syntax highlighting provider */
 export const editorTokensProvider: MonacoTokensProvider = {
   tokenizer: {
     root: [
-      [/Ingredients./, "red"],
-      [/Method./, "red"],
-      [/mixing bowl/, "green"],
-      [/baking dish/, "blue"],
-      [/\d(st|nd|rd|th)?/, "orange"],
+      [/^\s*$/, { token: "" }],
+      [/^.+$/, { token: "variable.function", next: "@recipe" }],
+    ],
+    recipe: [
+      [/^\s*Ingredients\.\s*$/, { token: "annotation", next: "@ingredients" }],
+      [/^\s*Method\.\s*$/, { token: "annotation", next: "@method" }],
+      [
+        /(^\s*)(Serves )(\d+)(\.\s*$)/,
+        ["", "", "number", { token: "", next: "@popall" }] as any,
+      ],
+      [/^.+$/, { token: "comment" }],
+    ],
+    ingredients: [
+      [/\d+/, "number"],
+      [/ (g|kg|pinch(?:es)?|ml|l|dash(?:es)?) /, "type"],
+      [/ ((heaped|level) )?(cups?|teaspoons?|tablespoons?) /, "type"],
+      [/^\s*$/, { token: "", next: "@pop" }],
+    ],
+    method: [
+      [/mixing bowl/, "tag"],
+      [/baking dish/, "meta"],
+      [
+        /(^|\.\s*)(Take|Put|Fold|Add|Remove|Combine|Divide|Liquefy|Stir|Mix|Clean|Pour|Set aside|Serve with|Refrigerate)($| )/,
+        ["", "keyword", ""],
+      ],
+      [/^\s*$/, { token: "", next: "@pop" }],
     ],
   },
-  defaultToken: "plain",
+  defaultToken: "",
 };
