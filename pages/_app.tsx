@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import "../styles/editor.css";
+import "../styles/mosaic.scss";
 import "@blueprintjs/core/lib/css/blueprint.css";
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "react-mosaic-component/react-mosaic-component.css";
