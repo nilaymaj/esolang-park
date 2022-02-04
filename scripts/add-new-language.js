@@ -22,6 +22,19 @@ if (fs.existsSync(dir)) {
 fs.mkdirSync(dir);
 
 /**
+ * Remove the "// @ts-nocheck" line at the top of given file contents.
+ * Returns null if file doesn't start with the comment.
+ * @param {string} contents String containing contents, lines separated by "\n"
+ * @returns Contents with first line removed
+ */
+const cropFirstLine = (contents) => {
+  const lines = contents.split("\n");
+  const firstLine = lines.shift();
+  if (firstLine !== "// @ts-nocheck") return null;
+  else return lines.join("\n");
+};
+
+/**
  * Copy a file from source path to destination.
  * Also removes first line from file, which contains the "@ts-nocheck" comment
  * @param {string} src Absolute path to source file
@@ -29,13 +42,12 @@ fs.mkdirSync(dir);
  */
 const copyFile = (src, dest) => {
   const rawContents = fs.readFileSync(src).toString();
-  const lines = rawContents.split("\n");
-  const firstLine = lines.shift();
-  if (firstLine !== "// @ts-nocheck") {
+  const destContents = cropFirstLine(rawContents);
+  if (destContents) {
     console.error(`Template file '${src}' doesn't have @ts-nocheck comment`);
     process.exit(1);
   }
-  fs.writeFileSync(dest, lines.join("\n"));
+  fs.writeFileSync(dest, destContents);
 };
 
 {
@@ -62,7 +74,7 @@ const copyFile = (src, dest) => {
   // Generate Next.js page
   const src = path.resolve(__dirname, "./new-lang-template/ide-page.tsx");
   const dest = path.resolve(__dirname, `../pages/ide/${langId}.tsx`);
-  const contents = fs.readFileSync(src).toString();
+  const contents = cropFirstLine(fs.readFileSync(src).toString());
   const finalContents = contents
     .replace("$LANG_ID", langId)
     .replace("$LANG_NAME", langName);

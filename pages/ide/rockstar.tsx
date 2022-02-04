@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React from "react";
 import { NextPage } from "next";
 import Head from "next/head";
 import { Mainframe } from "../../ui/Mainframe";
 import LangProvider from "../../languages/rockstar";
-const LANG_ID = "$LANG_ID";
+const LANG_ID = "rockstar";
 const LANG_NAME = "Rockstar";
 
 const IDE: NextPage = () => {

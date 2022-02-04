@@ -29,12 +29,14 @@ export const Header = (props: Props) => {
         alignItems: "center",
       }}
     >
-      <Button minimal large>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Image src={logoImg} alt="logo" width={20} height={20} />
-          <span style={{ marginLeft: 10 }}>Esolang Park</span>
-        </div>
-      </Button>
+      <a href="/" title="Return to home page">
+        <Button minimal large>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Image src={logoImg} alt="logo" width={20} height={20} />
+            <span style={{ marginLeft: 10 }}>Esolang Park</span>
+          </div>
+        </Button>
+      </a>
       <Tag large minimal style={{ marginLeft: 10 }}>
         {props.langName}
       </Tag>

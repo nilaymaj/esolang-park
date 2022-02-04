@@ -48,7 +48,7 @@ export const editorTokensProvider: MonacoTokensProvider = {
   // prettier-ignore
   operators: ["plus", "with", "minus", "without", "times", "of", "over", "between",
    "build", "knock", "up", "down", "is", "are", "was", "were", "ain't", "aren't", 
-   "wasn't", "weren't", "and", "or", "nor", "not"],
+   "wasn't", "weren't", "and", "or", "nor", "not", "like"],
 
   // prettier-ignore
   inbuiltFns: ["say", "shout", "whisper", "scream", "cast", "burn", "rock", "push", 
@@ -91,7 +91,7 @@ export const editorTokensProvider: MonacoTokensProvider = {
       [/listen to/, "constant.function"],
       // Catchall for keywords
       [
-        /[^ \s]+/,
+        /[^\s]+\b/,
         {
           cases: {
             "@constants": "constant",
