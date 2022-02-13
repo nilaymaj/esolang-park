@@ -201,7 +201,7 @@ Cast 1046 into result (result = "Ж" - Unicode 1046)
   - Greater than: `is higher/greater/bigger/stronger than`
   - Less than: `is lower/less/smaller/weaker than`
   - Greater or equal: `is as high/great/big/strong as`
-  - Less than: `is as low/little/small/weak as`
+  - Less or equal: `is as low/little/small/weak as`
 
 ### Logical operators
 
@@ -376,7 +376,7 @@ Declaring functions:
 
 - Function declaration syntax: `<fn-name> takes/wants <arg list>`
 - Argument list is separated by `,`, `and`, `&`, `n`.
-- Functions always have return value. Keyword: `return, give, give, send`.
+- Functions always have return value. Keyword: `return, give, send`.
 - Return syntax: `<keyword> <var> [back]` (`back` is optional)
 
 ```

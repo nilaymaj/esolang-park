@@ -1,5 +1,6 @@
 import { LanguageEngine, StepExecutionResult } from "../../types";
 import { RS } from "../common/types";
+import { parseProgram } from "../parser";
 
 export default class XYZLanguageEngine implements LanguageEngine<RS> {
   resetState() {
@@ -7,10 +8,11 @@ export default class XYZLanguageEngine implements LanguageEngine<RS> {
   }
 
   validateCode(code: string) {
-    // TODO: Unimplemented
+    parseProgram(code);
   }
 
   prepare(code: string, input: string) {
+    parseProgram(code);
     // TODO: Unimplemented
   }
 
