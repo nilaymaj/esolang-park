@@ -157,6 +157,7 @@ const CodeEditorComponent = (props: Props, ref: React.Ref<CodeEditorRef>) => {
         // Self-modifying programs may add control characters to the code.
         // This option ensures such characters are properly displayed.
         renderControlCharacters: true,
+        fixedOverflowWidgets: true,
       }}
     />
   );
