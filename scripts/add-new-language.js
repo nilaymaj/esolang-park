@@ -43,7 +43,7 @@ const cropFirstLine = (contents) => {
 const copyFile = (src, dest) => {
   const rawContents = fs.readFileSync(src).toString();
   const destContents = cropFirstLine(rawContents);
-  if (destContents) {
+  if (!destContents) {
     console.error(`Template file '${src}' doesn't have @ts-nocheck comment`);
     process.exit(1);
   }
