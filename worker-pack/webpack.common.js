@@ -11,15 +11,13 @@ for (const lang of langNames) {
   entryPoints[lang] = `./languages/${lang}/engine.ts`;
 }
 
-console.log(path.resolve(__dirname, "worker-pack/tsconfig.json"));
-
 module.exports = {
   entry: entryPoints,
   output: {
     path: path.resolve(__dirname, "../public/workers"),
     filename: "[name].js",
   },
-  resolve: { extensions: [".ts"] },
+  resolve: { extensions: [".ts", ".js"] },
   module: {
     rules: [
       {
