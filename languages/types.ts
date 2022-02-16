@@ -2,20 +2,27 @@ import monaco from "monaco-editor";
 import React from "react";
 
 /**
- * Type alias for defining range of characters in a single line.
- * - Missing `start` means range starting from start of the line.
- * - Missing `end` means range ending at the end of the line.
- */
-export type CharRange = { start?: number; end?: number };
-
-/**
- * Type denoting a range of text in document spanning within a line.
+ * Type denoting a contiguous range of text in document.
+ * All fields must be zero-indexed.
  */
 export type DocumentRange = {
-  /** Line number of the range */
-  line: number;
-  /** Section of line - omit to cover entire line */
-  charRange?: CharRange;
+  /** Line number on which the range starts */
+  startLine: number;
+  /**
+   * Column number on which the range starts.
+   * Omit to make the range start at the beginning of the line.
+   */
+  startCol?: number;
+  /**
+   * Line number on which the range ends.
+   * Omit to make the range end on the starting line.
+   */
+  endLine?: number;
+  /**
+   * Column number on which the range ends.
+   * Omit to make the range end at the end of the line.
+   */
+  endCol?: number;
 };
 
 /** Type denoting a document edit */

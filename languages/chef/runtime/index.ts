@@ -96,7 +96,7 @@ export default class ChefLanguageEngine implements LanguageEngine<T.ChefRS> {
       const currFrame = this.getCurrentFrame();
       if (currFrame.pc === currFrame.recipe.method.length) {
         // Next step is "Serves" statement
-        nextStepLocation = { line: currFrame.recipe.serves!.line + 1 };
+        nextStepLocation = { startLine: currFrame.recipe.serves!.line };
       } else {
         // Next step is a regular method instruction
         const nextOp = currFrame.recipe.method[currFrame.pc];

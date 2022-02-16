@@ -51,8 +51,7 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
     let nextStepLocation: DocumentRange | null = null;
     if (this._pc < this._ast.length) {
       const { line, char } = this._ast[this._pc].location;
-      const charRange = { start: char, end: char + 1 };
-      nextStepLocation = { line, charRange };
+      nextStepLocation = { startLine: line, startCol: char, endCol: char + 1 };
     }
 
     // Prepare and return execution result
@@ -85,8 +84,9 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
           jumpTarget = loopStack.pop();
           if (jumpTarget == null)
             throw new ParseError("Unmatched ']'", {
-              line: lIdx,
-              charRange: { start: cIdx, end: cIdx + 1 },
+              startLine: lIdx,
+              startCol: cIdx,
+              endCol: cIdx + 1,
             });
           // Add closing end location to loop-opener
           ast[jumpTarget].instr.param = ast.length;
@@ -105,8 +105,9 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
       const opener = loopStack[loopStack.length - 1];
       const location = ast[opener].location;
       throw new ParseError("Unmatched '['", {
-        line: location.line,
-        charRange: { start: location.char, end: location.char + 1 },
+        startLine: location.line,
+        startCol: location.char,
+        endCol: location.char + 1,
       });
     }
 

@@ -42,8 +42,7 @@ export default class DeadfishLanguageEngine implements LanguageEngine<DFRS> {
     let nextStepLocation: DocumentRange | null = null;
     if (this._pc < this._ast.length) {
       const { line, char } = this._ast[this._pc].location;
-      const charRange = { start: char, end: char + 1 };
-      nextStepLocation = { line, charRange };
+      nextStepLocation = { startLine: line, startCol: char, endCol: char + 1 };
     }
 
     // Prepare and return execution result

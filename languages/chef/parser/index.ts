@@ -30,8 +30,9 @@ export const parseProgram = (code: string): T.ChefProgram => {
   // Location of code's last char, used for errors
   const lastCharPosition = stack[0]?.line.length - 1 || 0;
   const lastCharRange: DocumentRange = {
-    line: stack.length - 1,
-    charRange: { start: lastCharPosition, end: lastCharPosition + 1 },
+    startLine: stack.length - 1,
+    startCol: lastCharPosition,
+    endCol: lastCharPosition + 1,
   };
 
   // Exhaust any empty lines at the start of the program
@@ -69,9 +70,11 @@ const parseTitle = (stack: CodeStack, lastCharRange: DocumentRange): string => {
   const { line, row } = popCodeStack(stack, true);
   if (line === null)
     throw new ParseError("Expected recipe title", lastCharRange);
-  if (!line) throw new ParseError("Expected recipe title", { line: row });
+  if (!line) throw new ParseError("Expected recipe title", { startLine: row });
   if (!line.endsWith("."))
-    throw new ParseError("Recipe title must end with period", { line: row });
+    throw new ParseError("Recipe title must end with period", {
+      startLine: row,
+    });
   return line.slice(0, -1);
 };
 
@@ -86,7 +89,7 @@ const parseEmptyLine = (
 ): void => {
   const { line, row } = popCodeStack(stack, true);
   if (line === null) throw new ParseError("Expected blank line", lastCharRange);
-  if (line) throw new ParseError("Expected blank line", { line: row });
+  if (line) throw new ParseError("Expected blank line", { startLine: row });
 };
 
 /** Parse the stack for method instructions section */
@@ -98,7 +101,7 @@ const parseRecipeComments = (stack: CodeStack): void => {
 const parseIngredientsHeader = (stack: CodeStack): void => {
   const { line, row } = popCodeStack(stack, true);
   if (line !== "Ingredients.")
-    throw new ParseError("Expected ingredients header", { line: row });
+    throw new ParseError("Expected ingredients header", { startLine: row });
 };
 
 /** Parse the stack for ingredient definition lines */
@@ -117,7 +120,7 @@ const parseCookingTime = (stack: CodeStack): void => {
   const regex = /^Cooking time: \d+ (?:hours?|minutes?).$/;
   const { line, row } = popCodeStack(stack, true);
   if (!line!.match(regex))
-    throw new ParseError("Invalid cooking time statement", { line: row });
+    throw new ParseError("Invalid cooking time statement", { startLine: row });
 };
 
 /** Parse stack for oven setting statement. No data is returned. */
@@ -126,14 +129,14 @@ const parseOvenSetting = (stack: CodeStack): void => {
     /^Pre-heat oven to \d+ degrees Celsius(?: \(gas mark [\d/]+\))?.$/;
   const { line, row } = popCodeStack(stack, true);
   if (!line!.match(regex))
-    throw new ParseError("Invalid oven setting statement", { line: row });
+    throw new ParseError("Invalid oven setting statement", { startLine: row });
 };
 
 /** Parse the stack for the header of method section */
 const parseMethodHeader = (stack: CodeStack): void => {
   const { line, row } = popCodeStack(stack, true);
   if (line !== "Method.")
-    throw new ParseError('Expected "Method."', { line: row });
+    throw new ParseError('Expected "Method."', { startLine: row });
 };
 
 /** Parse the stack for method instructions section */
@@ -233,7 +236,7 @@ const serializeMethodOps = (stack: CodeStack): MethodSegment[] => {
     for (let i = 0; i < periodIdxs.length - 1; ++i) {
       const start = periodIdxs[i] + 1;
       const end = periodIdxs[i + 1];
-      const range = { line: item.row, charRange: { start, end } };
+      const range = { startLine: item.row, startCol: start, endCol: end };
       segments.push({
         str: item.line.slice(start, end).trim(),
         location: range,
@@ -248,7 +251,8 @@ const serializeMethodOps = (stack: CodeStack): MethodSegment[] => {
 const parseServesLine = (stack: CodeStack): T.ChefRecipeServes => {
   const { line, row } = popCodeStack(stack, true);
   const match = line!.match(/^Serves (\d+).$/);
-  if (!match) throw new ParseError("Malformed serves statement", { line: row });
+  if (!match)
+    throw new ParseError("Malformed serves statement", { startLine: row });
   return { line: row, num: parseInt(match[1], 10) };
 };
 

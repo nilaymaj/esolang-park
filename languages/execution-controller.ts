@@ -1,4 +1,4 @@
-import { LanguageEngine, StepExecutionResult } from "./types";
+import { DocumentRange, LanguageEngine, StepExecutionResult } from "./types";
 import {
   isParseError,
   isRuntimeError,
@@ -187,7 +187,7 @@ class ExecutionController<RS> {
     }
 
     // Check if next line has breakpoint
-    if (this._breakpoints.includes(this._result.nextStepLocation!.line)) {
+    if (this.checkBreakpoint(this._result.nextStepLocation!)) {
       this._result.signal = "paused";
       return true;
     }
@@ -198,6 +198,19 @@ class ExecutionController<RS> {
   /** Sleep for `ms` milliseconds */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /** Check if the given DocumentRange has a breakpoint */
+  private checkBreakpoint(location: DocumentRange): boolean {
+    if (location.endLine == null) {
+      // Single line - just check if line is breakpoint
+      return this._breakpoints.includes(location.startLine);
+    } else {
+      // Multiline - check if any line is breakpoint
+      for (let line = location.startLine; line <= location.endLine; line++)
+        if (this._breakpoints.includes(line)) return true;
+      return false;
+    }
   }
 }
 

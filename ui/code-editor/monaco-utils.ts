@@ -23,12 +23,15 @@ export const createHighlightRange = (
   highlights: DocumentRange
 ): MonacoDecoration => {
   const location = get1IndexedLocation(highlights);
-  const lineNum = location.line;
-  const startChar = location.charRange?.start || 0;
-  const endChar = location.charRange?.end || 1e5;
-  const range = new monacoInstance.Range(lineNum, startChar, lineNum, endChar);
-  const isWholeLine = !location.charRange;
-  return { range, options: { isWholeLine, inlineClassName: "code-highlight" } };
+  let { startLine, endLine, startCol, endCol } = location;
+  const range = new monacoInstance.Range(
+    startLine,
+    startCol == null ? 1 : startCol,
+    endLine == null ? startLine : endLine,
+    endCol == null ? Infinity : endCol
+  );
+  // const isWholeLine = startCol == null && endCol == null;
+  return { range, options: { inlineClassName: "code-highlight" } };
 };
 
 /** Create Monaco decoration range object from highlights */
@@ -49,11 +52,12 @@ export const createValidationMarker = (
   range: DocumentRange
 ): monaco.editor.IMarkerData => {
   const location = get1IndexedLocation(range);
+  const { startLine, endLine, startCol, endCol } = location;
   return {
-    startLineNumber: location.line,
-    endLineNumber: location.line,
-    startColumn: location.charRange?.start || 0,
-    endColumn: location.charRange?.end || 1000,
+    startLineNumber: startLine,
+    endLineNumber: endLine == null ? startLine : endLine,
+    startColumn: startCol == null ? 1 : startCol,
+    endColumn: endCol == null ? Infinity : endCol,
     severity: monacoInstance.MarkerSeverity.Error,
     message: error.message,
     source: error.name,
@@ -69,13 +73,14 @@ export const createMonacoDocEdit = (
   edit: DocumentEdit
 ): monaco.editor.IIdentifiedSingleEditOperation => {
   const location = get1IndexedLocation(edit.range);
+  const { startLine, endLine, startCol, endCol } = location;
   return {
     text: edit.text,
     range: {
-      startLineNumber: location.line,
-      endLineNumber: location.line,
-      startColumn: location.charRange?.start || 0,
-      endColumn: location.charRange?.end || 1000,
+      startLineNumber: startLine,
+      endLineNumber: endLine == null ? startLine : endLine,
+      startColumn: startCol == null ? 1 : startCol,
+      endColumn: endCol == null ? Infinity : endCol,
     },
   };
 };
@@ -87,12 +92,10 @@ export const createMonacoDocEdit = (
  * @returns DocumentRange that uses 1-indexed values
  */
 const get1IndexedLocation = (range: DocumentRange): DocumentRange => {
-  const lineNum = range.line + 1;
-  const charRange = range.charRange
-    ? {
-        start: range.charRange.start ? range.charRange.start + 1 : undefined,
-        end: range.charRange.end ? range.charRange.end + 1 : undefined,
-      }
-    : undefined;
-  return { line: lineNum, charRange };
+  return {
+    startLine: range.startLine + 1,
+    startCol: range.startCol == null ? 1 : range.startCol + 1,
+    endLine: range.endLine == null ? range.startLine + 1 : range.endLine + 1,
+    endCol: range.endCol == null ? Infinity : range.endCol + 1,
+  };
 };

@@ -30,11 +30,11 @@ describe("Parsing entire programs", () => {
     expect(method.length).toBe(14);
     expect(method.slice(0, 12).every((m) => m.op.code === "PUSH")).toBe(true);
     expect(method[12].op.code).toBe("LIQ-BOWL");
-    expect(method[12].location.line).toBe(17);
-    expect([403, 404]).toContain(method[12].location.charRange?.start);
-    expect([439, 440]).toContain(method[12].location.charRange?.end);
+    expect(method[12].location.startLine).toBe(17);
+    expect([403, 404]).toContain(method[12].location.startCol);
+    expect([439, 440]).toContain(method[12].location.endCol);
     expect(method[13].op.code).toBe("COPY");
-    expect(method[13].location.line).toBe(17);
+    expect(method[13].location.startLine).toBe(17);
   });
 
   test("Fibonacci Du Fromage", () => {
@@ -54,13 +54,13 @@ describe("Parsing entire programs", () => {
     const mainMethod = program.main.method;
     expect(mainMethod.length).toBe(19);
     expect(mainMethod[0].op.code).toBe("STDIN");
-    expect(mainMethod[0].location.line).toBe(10);
-    expect(mainMethod[0].location.charRange?.start).toBe(0);
-    expect(mainMethod[0].location.charRange?.end).toBe(30);
+    expect(mainMethod[0].location.startLine).toBe(10);
+    expect(mainMethod[0].location.startCol).toBe(0);
+    expect(mainMethod[0].location.endCol).toBe(30);
     expect(mainMethod[18].op.code).toBe("COPY");
-    expect(mainMethod[18].location.line).toBe(28);
-    expect(mainMethod[18].location.charRange?.start).toBe(0);
-    expect(mainMethod[18].location.charRange?.end).toBe(57);
+    expect(mainMethod[18].location.startLine).toBe(28);
+    expect(mainMethod[18].location.startCol).toBe(0);
+    expect(mainMethod[18].location.endCol).toBe(57);
 
     // Check loop jump addresses in method
     const mainOpener1 = mainMethod[8].op as LoopOpenOp;
@@ -85,13 +85,13 @@ describe("Parsing entire programs", () => {
     const auxMethod = program.auxes["salt and pepper"].method;
     expect(auxMethod.length).toBe(5);
     expect(auxMethod[0].op.code).toBe("POP");
-    expect(auxMethod[0].location.line).toBe(39);
-    expect(auxMethod[0].location.charRange?.start).toBe(0);
-    expect(auxMethod[0].location.charRange?.end).toBe(26);
+    expect(auxMethod[0].location.startLine).toBe(39);
+    expect(auxMethod[0].location.startCol).toBe(0);
+    expect(auxMethod[0].location.endCol).toBe(26);
     expect(auxMethod[4].op.code).toBe("ADD");
-    expect(auxMethod[4].location.line).toBe(43);
-    expect(auxMethod[4].location.charRange?.start).toBe(0);
-    expect(auxMethod[4].location.charRange?.end).toBe(10);
+    expect(auxMethod[4].location.startLine).toBe(43);
+    expect(auxMethod[4].location.startCol).toBe(0);
+    expect(auxMethod[4].location.endCol).toBe(10);
   });
 
   test("Hello World Cake with Chocolate Sauce", () => {
@@ -112,13 +112,13 @@ describe("Parsing entire programs", () => {
     const mainMethod = program.main.method;
     expect(mainMethod.length).toBe(15);
     expect(mainMethod[0].op.code).toBe("PUSH");
-    expect(mainMethod[0].location.line).toBe(27);
-    expect(mainMethod[0].location.charRange?.start).toBe(0);
-    expect(mainMethod[0].location.charRange?.end).toBe(40);
+    expect(mainMethod[0].location.startLine).toBe(27);
+    expect(mainMethod[0].location.startCol).toBe(0);
+    expect(mainMethod[0].location.endCol).toBe(40);
     expect(mainMethod[14].op.code).toBe("FNCALL");
-    expect(mainMethod[14].location.line).toBe(41);
-    expect(mainMethod[14].location.charRange?.start).toBe(0);
-    expect(mainMethod[14].location.charRange?.end).toBe(26);
+    expect(mainMethod[14].location.startLine).toBe(41);
+    expect(mainMethod[14].location.startCol).toBe(0);
+    expect(mainMethod[14].location.endCol).toBe(26);
 
     // Check loop jump addresses in method
     const mainOpener = mainMethod[12].op as LoopOpenOp;
@@ -142,13 +142,13 @@ describe("Parsing entire programs", () => {
     const auxMethod = program.auxes["chocolate sauce"].method;
     expect(auxMethod.length).toBe(13);
     expect(auxMethod[0].op.code).toBe("CLEAR");
-    expect(auxMethod[0].location.line).toBe(53);
-    expect(auxMethod[0].location.charRange?.start).toBe(0);
-    expect(auxMethod[0].location.charRange?.end).toBe(21);
+    expect(auxMethod[0].location.startLine).toBe(53);
+    expect(auxMethod[0].location.startCol).toBe(0);
+    expect(auxMethod[0].location.endCol).toBe(21);
     expect(auxMethod[12].op.code).toBe("END");
-    expect(auxMethod[12].location.line).toBe(65);
-    expect(auxMethod[12].location.charRange?.start).toBe(0);
-    expect(auxMethod[12].location.charRange?.end).toBe(22);
+    expect(auxMethod[12].location.startLine).toBe(65);
+    expect(auxMethod[12].location.startCol).toBe(0);
+    expect(auxMethod[12].location.endCol).toBe(22);
 
     // Check loop jump addresses in method
     const auxOpener = auxMethod[4].op as LoopOpenOp;

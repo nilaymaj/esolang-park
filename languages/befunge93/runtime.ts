@@ -117,13 +117,13 @@ export default class Befunge93LanguageEngine
     const lines = code.split("\n");
     if (lines.length > COLSIZE)
       throw new ParseError(`Code is longer than ${COLSIZE} lines`, {
-        line: COLSIZE,
+        startLine: COLSIZE,
       });
     lines.forEach((line, idx) => {
       if (line.length > ROWSIZE)
         throw new ParseError(`Line is longer than ${ROWSIZE} characters`, {
-          line: idx,
-          charRange: { start: ROWSIZE },
+          startLine: idx,
+          startCol: ROWSIZE,
         });
     });
 
@@ -359,7 +359,7 @@ export default class Befunge93LanguageEngine
     // Return code edit object
     return {
       text: toSafePrintableChar(asciiVal),
-      range: { line: y, charRange: { start: x, end: x + 1 } },
+      range: { startLine: y, startCol: x, endCol: x + 1 },
     };
   }
 
@@ -418,15 +418,16 @@ export default class Befunge93LanguageEngine
         // Add padding to line upto full-length
         edits.push({
           range: {
-            line: i,
-            charRange: { start: lines[i].length, end: lines[i].length },
+            startLine: i,
+            startCol: lines[i].length,
+            endCol: lines[i].length,
           },
           text: " ".repeat(ROWSIZE - lines[i].length),
         });
       } else {
         // Add full-length empty line
         edits.push({
-          range: { line: i, charRange: { start: 0, end: 0 } },
+          range: { startLine: i, startCol: 0, endCol: 0 },
           text: "\n" + " ".repeat(80),
         });
       }
@@ -448,7 +449,7 @@ export default class Befunge93LanguageEngine
 
   /** Convert 2D coordinates to DocumentRange */
   private toRange(line: number, char: number): DocumentRange {
-    return { line, charRange: { start: char, end: char + 1 } };
+    return { startLine: line, startCol: char, endCol: char + 1 };
   }
 
   /** Check if given coordinates lies inside 80x25 grid */
