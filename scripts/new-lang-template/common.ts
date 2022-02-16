@@ -17,10 +17,10 @@ export const sampleProgram = [
 export const editorTokensProvider: MonacoTokensProvider = {
   tokenizer: {
     root: [
-      [/i/, "orange"],
-      [/d/, "red"],
-      [/s/, "blue"],
-      [/o/, "green"],
+      [/i/, "variable"],
+      [/d/, "keyword"],
+      [/s/, "constant"],
+      [/o/, "operator"],
     ],
   },
   defaultToken: "comment",

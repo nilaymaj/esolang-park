@@ -91,7 +91,7 @@
     { "token": "meta", "foreground": "2D72D2", "note": "blue" },
     { "token": "key", "foreground": "CD4246", "note": "red" },
     { "token": "operators", "foreground": "147EB3", "note": "cerulean" },
-    { "token": "attribute", "foreground": "D1980B", "note": "gold" },
+    { "token": "attribute", "foreground": "C87619", "note": "orange" },
     { "token": "string", "foreground": "238551", "note": "green" },
     { "token": "keyword", "foreground": "9D3F9D", "note": "violet" },
     { "token": "comment", "foreground": "5F6B7C", "fontStyle": "italic" }
