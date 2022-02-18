@@ -76,12 +76,11 @@ export default class DeadfishLanguageEngine implements LanguageEngine<DFRS> {
    * @returns String to append to output, if any
    */
   private processOp(instr: DF_OP): string | undefined {
+    if (this._value === -1 || this._value === 256) this._value = 0;
     if (instr === DF_OP.INCR) ++this._value;
     else if (instr === DF_OP.DECR) --this._value;
     else if (instr === DF_OP.SQ) this._value = this._value * this._value;
     else if (instr === DF_OP.OUT) return this._value.toString();
     else throw new Error("Invalid instruction");
-
-    if (this._value === -1 || this._value === 256) this._value = 0;
   }
 }
