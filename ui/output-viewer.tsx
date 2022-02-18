@@ -66,7 +66,9 @@ const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
   }));
 
   return (
-    <div style={{ padding: 10, fontSize: 16 }}>
+    <div
+      style={{ height: "100%", padding: 10, fontSize: 16, overflowY: "auto" }}
+    >
       <pre
         style={{ margin: 0, whiteSpace: "pre-wrap", wordWrap: "break-word" }}
       >

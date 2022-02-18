@@ -27,15 +27,24 @@ const InputEditorComponent = (
   );
 
   return (
-    <TextArea
-      fill
-      large
-      growVertically
-      inputRef={textareaRef}
-      readOnly={props.readOnly}
-      placeholder="Enter program input here..."
-      style={{ height: "100%", resize: "none", boxShadow: "none" }}
-    />
+    <div style={{ height: "100%" }}>
+      <TextArea
+        fill
+        large
+        growVertically
+        inputRef={textareaRef}
+        readOnly={props.readOnly}
+        placeholder="Enter program input here..."
+        style={{
+          resize: "none",
+          boxShadow: "none",
+          // BlueprintJS edits the element's height directly as px which leads
+          // to overflow and underflow issues, so we 1-up it with our own weapons.
+          maxHeight: "100%",
+          minHeight: "100%",
+        }}
+      />
+    </div>
   );
 };
 
