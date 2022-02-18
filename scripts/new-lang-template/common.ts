@@ -7,11 +7,9 @@ export type RS = {
 };
 
 /** Sample program */
-export const sampleProgram = [
-  "Program line 1",
-  "Program line 2",
-  "Program line 3",
-].join("\n");
+export const sampleProgram = `Program line 1
+Program line 2
+Program line 3`;
 
 /** Syntax highlighting */
 export const editorTokensProvider: MonacoTokensProvider = {

@@ -17,6 +17,6 @@ export default class XYZLanguageEngine implements LanguageEngine<RS> {
 
   executeStep(): StepExecutionResult<RS> {
     // TODO: Unimplemented
-    return { rendererState: { value: 0 }, nextStepLocation: { line: 0 } };
+    return { rendererState: { value: 0 }, nextStepLocation: { startLine: 0 } };
   }
 }

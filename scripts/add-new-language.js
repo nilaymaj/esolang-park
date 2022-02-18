@@ -76,8 +76,8 @@ const copyFile = (src, dest) => {
   const dest = path.resolve(__dirname, `../pages/ide/${langId}.tsx`);
   const contents = cropFirstLine(fs.readFileSync(src).toString());
   const finalContents = contents
-    .replace("$LANG_ID", langId)
-    .replace("$LANG_NAME", langName);
+    .replace(/\$LANG_ID/g, langId)
+    .replace(/\$LANG_NAME/g, langName);
   fs.writeFileSync(dest, finalContents);
 }
 
