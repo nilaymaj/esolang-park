@@ -4,17 +4,31 @@ import {
   WorkerParseError,
   WorkerRuntimeError,
 } from "../languages/worker-errors";
+import { DocumentRange } from "../languages/types";
 
-/** Format a ParseError for displaying as output */
-const formatParseError = (error: WorkerParseError): string => {
-  const line = error.range.line + 1;
-  const start = error.range.charRange?.start;
-  const end = error.range.charRange?.end;
-  let cols: string | null = null;
-  if (start != null && end != null) cols = `col ${start + 1}-${end + 1}`;
-  else if (start != null) cols = `col ${start + 1}`;
-  else if (end != null) cols = `col ${end + 1}`;
-  return `ParseError: line ${line}, ${cols}\n${error.message}`;
+/** Format a DocumentRange for displaying as output */
+const formatRange = (range: DocumentRange): string => {
+  if (range.endLine == null || range.endLine == range.startLine) {
+    // `line 2, col 2-4` OR `line 2, col 3`
+    const line = range.startLine + 1;
+    const { startCol, endCol } = range;
+    let cols: string | null = null;
+    if (startCol != null && endCol != null)
+      cols = `col ${startCol + 1}-${endCol + 1}`;
+    else if (startCol != null) cols = `col ${startCol + 1}`;
+    else if (endCol != null) cols = `col ${endCol + 1}`;
+    return `line ${line}, ${cols}`;
+  } else {
+    // `lines 2:3 - 3:12` OR `lines 2-3:12` OR `lines 2-3`
+    const { startLine, endLine, startCol, endCol } = range;
+    const start =
+      (startLine + 1).toString() +
+      (startCol == null ? "" : ":" + (startCol + 1).toString());
+    const end =
+      (endLine + 1).toString() +
+      (endCol == null ? "" : ":" + (endCol + 1).toString());
+    return `lines ${start} - ${end}`;
+  }
 };
 
 export interface OutputViewerRef {
@@ -28,7 +42,10 @@ export interface OutputViewerRef {
 
 const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
   const [value, setValue] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<{
+    header: string;
+    message: string;
+  } | null>(null);
 
   React.useImperativeHandle(ref, () => ({
     reset: () => {
@@ -39,8 +56,12 @@ const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
     setError: (error: WorkerRuntimeError | WorkerParseError | null) => {
       if (!error) setError(null);
       else if (error.name === "RuntimeError")
-        setError("RuntimeError: " + error.message);
-      else if (error.name === "ParseError") setError(formatParseError(error));
+        setError({ header: "RuntimeError: ", message: error.message });
+      else if (error.name === "ParseError")
+        setError({
+          header: "ParseError: " + formatRange(error.range),
+          message: error.message,
+        });
     },
   }));
 
@@ -52,9 +73,12 @@ const OutputViewerComponent = (_: {}, ref: React.Ref<OutputViewerRef>) => {
         {value}
       </pre>
       {value && <div style={{ height: 10 }} />}
-      <Text style={{ fontFamily: "monospace", color: Colors.RED3 }}>
-        {error}
-      </Text>
+      {error != null && (
+        <Text style={{ fontFamily: "monospace", color: Colors.RED3 }}>
+          <p>{error.header}</p>
+          <p>{error.message}</p>
+        </Text>
+      )}
     </div>
   );
 };
