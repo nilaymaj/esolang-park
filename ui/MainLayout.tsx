@@ -13,6 +13,24 @@ const WindowTitles = {
   output: "Execution Output",
 };
 
+/**
+ * Default layout of the mosaic. This must be defined outside of
+ * the React component to persist layout adjustments by the user.
+ */
+const INITIAL_LAYOUT: MosaicNode<WINDOW_ID> = {
+  direction: "row",
+  first: "editor",
+  second: {
+    direction: "column",
+    first: "renderer",
+    second: {
+      direction: "row",
+      first: "input",
+      second: "output",
+    },
+  },
+};
+
 type Props = {
   langId: string;
   langName: string;
@@ -32,20 +50,6 @@ export const MainLayout = (props: Props) => {
     renderer: props.renderRenderer,
     input: props.renderInput,
     output: props.renderOutput,
-  };
-
-  const INITIAL_LAYOUT: MosaicNode<WINDOW_ID> = {
-    direction: "row",
-    first: "editor",
-    second: {
-      direction: "column",
-      first: "renderer",
-      second: {
-        direction: "row",
-        first: "input",
-        second: "output",
-      },
-    },
   };
 
   return (
