@@ -1,10 +1,11 @@
 # Chef
 
-## References
+Chef is a stack-based Turing-complete esolang created by David Morgan-Mar in 2002, in which programs read
+like cooking recipes. An important guideline while writing Chef programs/recipes is for the recipe to be easy
+to prepare and delicious. The complete language specification is available on the
+[official Chef homepage](https://www.dangermouse.net/esoteric/chef.html).
 
-- David Morgan-Mar's Chef page: https://www.dangermouse.net/esoteric/chef.html
-
-## Implementation details
+## Notes for the user
 
 - Ingredient names are case-sensitive and must contain only letters and spaces.
 
@@ -33,3 +34,21 @@
   <other instructions>
   Shake the mixture until blend.
   ```
+
+## Implementation details
+
+- The parser is hand-built and uses regular expressions for basically everything.
+- The engine is split in two classes: `Kitchen` handles kitchen-related operations while the main class
+  handles control-flow operations and manages the call-stack.
+
+## Possible improvements
+
+- Allow case-insensitive usage of auxiliary recipe names.
+
+- Chef syntax is flat and simple, easily representable by regular expressions. This means that syntax highlighting for
+  Chef can easily be made perfect by slightly modifying and reusing parser regexes for the Monarch tokenizer. Currently
+  the method part of syntax highlighting just highlights the known keywords.
+
+- We need to find a sensible solution for the verb tense issue mentioned above. Currently, any Chef program involving loops
+  requires modifications to be run in Esolang Park. Importing a very lightweight English verb-dictionary and only allowing
+  verbs from this dictionary is a possible way to resolve this.
