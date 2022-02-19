@@ -6,13 +6,15 @@ const CREATE_ISSUE_URL = "https://github.com/nilaymaj/esolang-park/issues/new";
 const styles = {
   errorTitle: {
     fontWeight: "bold",
-    whiteSpace: "pre-wrap" as "pre-wrap",
+    whiteSpace: "pre-wrap" as const,
   },
   callStack: {
     padding: 10,
+    maxHeight: 300,
+    overflowY: "auto" as const,
     borderRadius: 10,
     background: Colors.RED1,
-    whiteSpace: "pre-wrap" as "pre-wrap",
+    whiteSpace: "pre-wrap" as const,
     border: "1px solid " + Colors.RED4,
   },
 };
@@ -32,6 +34,7 @@ export const ErrorBoundaryProvider = (props: { children: React.ReactNode }) => {
           <Toast
             icon="error"
             intent="danger"
+            timeout={0}
             onDismiss={() => setError(null)}
             message={
               <Text>
