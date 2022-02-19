@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "build": "yarn run build:worker && next build",
     "dev:worker": "webpack -c worker-pack/webpack.dev.js --watch",
     "build:worker": "webpack -c worker-pack/webpack.prod.js",
     "add-new-language": "node scripts/add-new-language.js"
