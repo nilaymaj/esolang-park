@@ -11,7 +11,7 @@ import { GitHubIcon } from "../ui/custom-icons";
 
 const REPO_URL = "https://github.com/nilaymaj/esolang-park";
 const WIKI_URL = REPO_URL + "/wiki";
-const GUIDE_URL = REPO_URL + "/wiki/Language-Providers";
+const GUIDE_URL = REPO_URL + "/wiki/LP-Getting-Started";
 const ISSUE_URL = REPO_URL + "/issues/new";
 
 const styles = {
