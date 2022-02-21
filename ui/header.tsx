@@ -3,6 +3,7 @@ import logoImg from "./assets/logo.png";
 import { GitHubIcon } from "./custom-icons";
 import { useDarkMode } from "./providers/dark-mode-provider";
 import { Button, Card, Icon, Tag } from "@blueprintjs/core";
+import { useFeaturesGuide } from "./providers/features-guide-provider";
 
 /** Link to the project's GitHub repository */
 const REPO_LINK = "https://github.com/nilaymaj/esolang-park";
@@ -19,6 +20,7 @@ type Props = {
 
 export const Header = (props: Props) => {
   const DarkMode = useDarkMode();
+  const featuresGuide = useFeaturesGuide();
 
   const brandSection = (
     <div
@@ -51,10 +53,16 @@ export const Header = (props: Props) => {
     <div style={{ flex: 1, textAlign: "right", paddingRight: 8 }}>
       <a
         href={NOTES_LINK(props.langId)}
-        title="View implementation notes for this esolang"
+        title="View the notes for this esolang"
       >
-        <Button minimal icon={<Icon icon="info-sign" />} />
+        <Button minimal icon={<Icon icon="document" />} />
       </a>
+      <Button
+        minimal
+        title="View the features guide"
+        icon={<Icon icon="help" />}
+        onClick={featuresGuide.show}
+      />
       <Button
         minimal
         title="Toggle between dark and light mode"

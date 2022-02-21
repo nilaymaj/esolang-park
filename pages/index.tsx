@@ -1,5 +1,5 @@
 import React from "react";
-import { NextPage } from "next";
+import { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import logoImg from "../ui/assets/logo.png";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useDarkMode } from "../ui/providers/dark-mode-provider";
 import LANGUAGES from "./languages.json";
 import { GitHubIcon } from "../ui/custom-icons";
+import { Providers } from "../ui/providers";
 
 const REPO_URL = "https://github.com/nilaymaj/esolang-park";
 const WIKI_URL = REPO_URL + "/wiki";
@@ -50,7 +51,7 @@ const styles = {
   },
 };
 
-const Index: NextPage = () => {
+const Index: NextPageWithLayout = () => {
   const DarkMode = useDarkMode();
   const backgroundColor = DarkMode.isDark ? Colors.DARK_GRAY3 : Colors.WHITE;
 
@@ -111,6 +112,11 @@ const Index: NextPage = () => {
       </div>
     </>
   );
+};
+
+// Feature guide should not be shown on the home page
+Index.getLayout = function getLayout(page: React.ReactNode) {
+  return <Providers omitFeatureGuide={true}>{page}</Providers>;
 };
 
 export default Index;
