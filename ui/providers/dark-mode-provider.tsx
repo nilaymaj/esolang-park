@@ -35,6 +35,8 @@ export const DarkModeProvider = ({
           height: "100%",
           backgroundColor: isDark ? Colors.DARK_GRAY2 : Colors.GRAY4,
         }}
+        // This prevents white flash when loading/refreshing the page
+        className={isDark ? Classes.DARK : ""}
       >
         {children}
       </div>
