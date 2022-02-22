@@ -3,6 +3,7 @@ import {
   ButtonGroup,
   Icon,
   NumericInput,
+  Spinner,
   Tag,
 } from "@blueprintjs/core";
 
@@ -121,6 +122,9 @@ type Props = {
 export const ExecutionControls = (props: Props) => {
   return (
     <div style={styles.container}>
+      <div style={{ width: 20, marginRight: 15 }}>
+        {props.state === "running" && <Spinner size={20} />}
+      </div>
       {props.state === "off" ? (
         <RunButton onClick={props.onRun} />
       ) : (
