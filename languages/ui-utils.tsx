@@ -1,41 +1,43 @@
+import { CSSProperties } from "react";
 import { Colors } from "@blueprintjs/core";
-import { useDarkMode } from "../../../ui/providers/dark-mode-provider";
+import { useDarkMode } from "../ui/providers/dark-mode-provider";
 
 const backgroundColorsLight = {
-  success: Colors.GREEN3,
-  danger: Colors.RED3,
-  plain: Colors.GRAY3,
-  active: Colors.DARK_GRAY1,
+  success: Colors.GREEN5,
+  danger: Colors.RED5,
+  plain: Colors.LIGHT_GRAY1,
+  active: Colors.GRAY4,
 };
 
 const backgroundColorsDark = {
-  success: Colors.GREEN3,
-  danger: Colors.RED3,
-  plain: Colors.GRAY3,
-  active: Colors.LIGHT_GRAY5,
+  success: Colors.GREEN1,
+  danger: Colors.RED1,
+  plain: Colors.DARK_GRAY5,
+  active: Colors.GRAY1,
 };
 
 const foregroundColorsLight = {
-  success: Colors.GREEN2,
-  danger: Colors.RED2,
+  success: Colors.GREEN1,
+  danger: Colors.RED1,
   plain: Colors.DARK_GRAY1,
-  active: Colors.LIGHT_GRAY5,
+  active: Colors.DARK_GRAY1,
 };
 
 const foregroundColorsDark = {
   success: Colors.GREEN5,
   danger: Colors.RED5,
   plain: Colors.LIGHT_GRAY5,
-  active: Colors.DARK_GRAY1,
+  active: Colors.LIGHT_GRAY5,
 };
 
 /**
- * Utility component that renders a tag similar to BlueprintJS tags, but underneath
- * is just a single span tag with no frills and high performance.
+ * Utility component for rendering a simple general-purpose stylable box. Useful
+ * for performance-critical components in visualisation renderers.
  */
-export const SimpleTag = (props: {
+export const Box = (props: {
   children: React.ReactNode;
-  intent?: "success" | "danger" | "active";
+  intent?: "plain" | "success" | "danger" | "active";
+  style?: CSSProperties;
 }) => {
   const { isDark } = useDarkMode();
   const intent = props.intent == null ? "plain" : props.intent;
@@ -49,9 +51,9 @@ export const SimpleTag = (props: {
         margin: 5,
         padding: "5px 10px",
         borderRadius: 3,
-        backgroundColor:
-          backgroundMap[intent] + (intent === "active" ? "aa" : "55"),
+        backgroundColor: backgroundMap[intent],
         color: foregroundMap[intent],
+        ...props.style,
       }}
     >
       {props.children}

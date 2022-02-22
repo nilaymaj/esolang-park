@@ -81,9 +81,12 @@ export const editorTokensProvider: MonacoTokensProvider = {
 };
 
 /** Serialize tape from object format into linear array */
-export const serializeTapeMap = (tape: BFRS["tape"]): number[] => {
+export const serializeTapeMap = (
+  tape: BFRS["tape"],
+  minCells: number = 0
+): number[] => {
   const cellIdxs = Object.keys(tape).map((s) => parseInt(s, 10));
-  const maxCellIdx = Math.max(15, ...cellIdxs);
+  const maxCellIdx = Math.max(minCells - 1, ...cellIdxs);
   const linearTape: number[] = Array(maxCellIdx + 1).fill(0);
   cellIdxs.forEach((i) => (linearTape[i] = tape[i] || 0));
   return linearTape;

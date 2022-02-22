@@ -1,14 +1,17 @@
-import { Card, Colors } from "@blueprintjs/core";
-import { CSSProperties } from "react";
-import { useDarkMode } from "../../ui/providers/dark-mode-provider";
+import * as React from "react";
 import { RendererProps } from "../types";
+import { Box } from "../ui-utils";
 import { BFRS, serializeTapeMap } from "./common";
 
-// Colors used as background of active cells
-const darkActiveBG = Colors.DARK_GRAY2;
-const lightActiveBG = Colors.LIGHT_GRAY3;
+/** Number of cells shown in a single row */
+const ROWSIZE = 8;
 
-const styles: { [k: string]: CSSProperties } = {
+// Parameters for cell sizing, balanced to span the full row width
+// Constraint: `(width% + 2 * margin%) * ROWSIZE = 100%`
+const CELL_WIDTH = "12%";
+const CELL_MARGIN = "5px 0.25%";
+
+const styles: { [k: string]: React.CSSProperties } = {
   container: {
     padding: 10,
     height: "100%",
@@ -19,9 +22,9 @@ const styles: { [k: string]: CSSProperties } = {
   },
   cell: {
     // Sizing
-    width: "12%",
+    width: CELL_WIDTH,
+    margin: CELL_MARGIN,
     height: "50px",
-    margin: "5px 0.25%",
     // Center-align values
     display: "flex",
     justifyContent: "center",
@@ -30,22 +33,24 @@ const styles: { [k: string]: CSSProperties } = {
 };
 
 /** Component for displaying a single tape cell */
-const Cell = ({ value, active }: { value: number; active: boolean }) => {
-  const { isDark } = useDarkMode();
-  const cellStyle = { ...styles.cell };
-  const activeBg = isDark ? darkActiveBG : lightActiveBG;
-  if (active) {
-    cellStyle.backgroundColor = activeBg;
-    cellStyle.fontWeight = "bold";
+const Cell = React.memo(
+  ({ value, active }: { value: number; active: boolean }) => {
+    return (
+      <Box
+        intent={active ? "active" : "plain"}
+        style={{ ...styles.cell, fontWeight: active ? "bold" : undefined }}
+      >
+        {value}
+      </Box>
+    );
   }
-  return <Card style={cellStyle}>{value}</Card>;
-};
+);
 
 /** Renderer for Brainfuck */
 export const Renderer = ({ state }: RendererProps<BFRS>) => {
   return (
     <div style={styles.container}>
-      {serializeTapeMap(state?.tape || {}).map((num, i) => (
+      {serializeTapeMap(state?.tape || {}, 2 * ROWSIZE).map((num, i) => (
         <Cell value={num} key={i} active={(state?.pointer || 0) === i} />
       ))}
     </div>

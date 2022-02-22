@@ -1,5 +1,5 @@
+import { Box } from "../../ui-utils";
 import { CharacterValue } from "../common";
-import { SimpleTag } from "./utils";
 
 type Props = {
   name: string;
@@ -13,9 +13,9 @@ export const CharacterRow = (props: Props) => {
     <div style={{ margin: "20px 10px" }}>
       <div>
         <b style={{ marginRight: 5 }}>{name}:</b>{" "}
-        <pre style={{ display: "inline" }}>{value.value}</pre>
+        <pre style={{ display: "inline", marginRight: 15 }}>{value.value}</pre>
         {value.stack.map((v, i) => (
-          <SimpleTag key={i}>{v}</SimpleTag>
+          <Box key={i}>{v}</Box>
         ))}
       </div>
       <div></div>

@@ -1,9 +1,17 @@
-import { Card, Colors, Icon, IconName } from "@blueprintjs/core";
+import * as React from "react";
+import { Colors, Icon, IconName } from "@blueprintjs/core";
 import { RendererProps } from "../types";
+import { Box } from "../ui-utils";
 import { Bfg93Direction, Bfg93RS } from "./constants";
 
 /** Common border color for dark and light, using transparency */
 export const BorderColor = Colors.GRAY3 + "55";
+
+// Parameters for cell sizing, balanced to span the full row width
+// Constraint: `(width% + 2 * margin%) * ROWSIZE = 100%`
+const ROWSIZE = 8;
+const CELL_WIDTH = "12%";
+const CELL_MARGIN = "5px 0.25%";
 
 const styles = {
   placeholderDiv: {
@@ -33,9 +41,9 @@ const styles = {
   },
   stackItem: {
     // Sizing
-    width: "10%",
-    height: "40px",
-    margin: "5px 0.25%",
+    width: CELL_WIDTH,
+    margin: CELL_MARGIN,
+    height: "50px",
     // Center-align values
     display: "flex",
     justifyContent: "center",
@@ -50,10 +58,10 @@ const DirectionIcons: { [k: string]: IconName } = {
   [Bfg93Direction.DOWN]: "arrow-down",
 };
 
-const StackItem = ({ value }: { value: number }) => {
-  const cellStyle = { ...styles.stackItem };
-  return <Card style={cellStyle}>{value}</Card>;
-};
+/** Component for displaying a single stack item */
+const StackItem = React.memo(({ value }: { value: number }) => {
+  return <Box style={styles.stackItem}>{value}</Box>;
+});
 
 export const Renderer = ({ state }: RendererProps<Bfg93RS>) => {
   if (state == null)
@@ -64,7 +72,6 @@ export const Renderer = ({ state }: RendererProps<Bfg93RS>) => {
       <div style={styles.dirnContainer}>
         <span style={{ fontWeight: "bold", marginRight: 5 }}>Direction: </span>
         <Icon icon={DirectionIcons[state.direction]} />
-        {/* <span style={{ marginLeft: 10 }} /> */}
         <span style={{ marginLeft: 30, fontWeight: "bold", marginRight: 5 }}>
           String mode:{" "}
         </span>

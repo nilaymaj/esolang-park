@@ -1,5 +1,6 @@
-import { Tag, Text } from "@blueprintjs/core";
-import { SimpleTag } from "./utils";
+import React from "react";
+import { Text } from "@blueprintjs/core";
+import { Box } from "../../ui-utils";
 
 const styles = {
   charChip: {
@@ -22,20 +23,16 @@ export const TopBar = (props: Props) => {
 
   const characterChips =
     charactersOnStage.length === 0 ? (
-      <Tag large minimal>
-        The stage is empty
-      </Tag>
+      <Box>The stage is empty</Box>
     ) : (
-      charactersOnStage.map((character) => {
-        return (
-          <SimpleTag
-            key={character}
-            intent={character === currSpeaker ? "active" : undefined}
-          >
-            {character}
-          </SimpleTag>
-        );
-      })
+      charactersOnStage.map((character) => (
+        <Box
+          key={character}
+          intent={character === currSpeaker ? "active" : "plain"}
+        >
+          {character}
+        </Box>
+      ))
     );
 
   return (
@@ -46,9 +43,9 @@ export const TopBar = (props: Props) => {
           <Text tagName="span" style={styles.questionText}>
             Answer to question:
           </Text>
-          <SimpleTag intent={questionState ? "success" : "danger"}>
+          <Box intent={questionState ? "success" : "danger"}>
             {questionState ? "yes" : "no"}
-          </SimpleTag>
+          </Box>
         </>
       )}
     </div>
