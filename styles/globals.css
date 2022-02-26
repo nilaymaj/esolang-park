@@ -21,3 +21,12 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.esolang-notes-hint {
+  transition: all 0.1s;
+  transform-origin: 100% 50%;
+}
+
+.esolang-notes-hint.hide {
+  transform: scaleX(0);
+}
