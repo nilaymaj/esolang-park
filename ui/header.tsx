@@ -80,6 +80,7 @@ export const Header = (props: Props) => {
     >
       <LangNotesHint show={showNotesHint} />
       <a
+        target="_blank"
         href={NOTES_LINK(props.langId)}
         onMouseEnter={() => setShowNotesHint(false)}
         title="View the notes for this esolang"
@@ -98,7 +99,7 @@ export const Header = (props: Props) => {
         icon={<Icon icon={DarkMode.isDark ? "flash" : "moon"} />}
         onClick={DarkMode.toggleDark}
       />
-      <a href={REPO_LINK} title="GitHub repository">
+      <a href={REPO_LINK} title="GitHub repository" target="_blank">
         <Button minimal icon={<Icon icon={<GitHubIcon />} />} />
       </a>
     </div>
