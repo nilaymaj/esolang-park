@@ -94,7 +94,7 @@ const parseEmptyLine = (
 
 /** Parse the stack for method instructions section */
 const parseRecipeComments = (stack: CodeStack): void => {
-  while (stack[stack.length - 1].line.trim() !== "") stack.pop();
+  while (stack[stack.length - 1]?.line.trim() !== "") stack.pop();
 };
 
 /** Parse the stack for the header of ingredients section */
@@ -266,6 +266,7 @@ const parseRecipe = (
   parseEmptyLine(stack, lastCharRange);
 
   // Check if exists and parse recipe comments
+  assertCodeStackNotEmpty(stack, lastCharRange);
   if (stack[stack.length - 1].line.trim() !== "Ingredients.") {
     parseRecipeComments(stack);
     parseEmptyLine(stack, lastCharRange);
@@ -277,12 +278,14 @@ const parseRecipe = (
   parseEmptyLine(stack, lastCharRange);
 
   // Check if exists and parse cooking time
+  assertCodeStackNotEmpty(stack, lastCharRange);
   if (stack[stack.length - 1].line.trim().startsWith("Cooking time: ")) {
     parseCookingTime(stack);
     parseEmptyLine(stack, lastCharRange);
   }
 
   // Check if exists and parse oven temperature
+  assertCodeStackNotEmpty(stack, lastCharRange);
   if (stack[stack.length - 1].line.trim().startsWith("Pre-heat oven ")) {
     parseOvenSetting(stack);
     parseEmptyLine(stack, lastCharRange);
@@ -348,4 +351,17 @@ const popCodeStack = (
   if (!item) return { line: null, row: -1 };
   const line = trim ? item.line.trim() : item.line;
   return { line, row: item.row };
+};
+
+/**
+ * Utility to assert that given code stack is not empty.
+ * If it is, throws a ParseError for unexpected EOF for the given DocumentRange.
+ * @param stack Code stack to assert on
+ * @param range DocumentRange to throw ParseError on
+ */
+const assertCodeStackNotEmpty = (
+  stack: CodeStack,
+  range: DocumentRange
+): void => {
+  if (stack.length == 0) throw new ParseError("Unexpected EOF", range);
 };
