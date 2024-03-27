@@ -157,4 +157,4 @@ export const LoopOpenerRegex =
  */
 export const LoopEnderRegex =
   /**   Verb      [       <Ingredient> ]        <Verbed>  */
-  /^(?:[a-zA-Z]+?)(?: the)?(?: ([a-zA-Z ]+?))? until ([a-zA-Z]+)ed$/;
+  /^(?:[a-zA-Z]+?)(?: the)?(?: ([a-zA-Z ]+?))? until ([a-zA-Z]+)$/;

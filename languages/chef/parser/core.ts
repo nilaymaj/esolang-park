@@ -16,7 +16,7 @@ import * as C from "../types";
  * @param verb Present form of verb
  * @returns Past form of verb
  */
-const toPresentTense = (verb: string) => {
+export const toPastTense = (verb: string) => {
   return verb.endsWith('e') ? verb + "d" : verb + "ed"
 };
 
@@ -216,7 +216,7 @@ export const parseMethodStep = (line: string): C.ChefOperation => {
     // `Verb` [the `ingredient`] until `verbed`
     const matches = assertMatch(line, R.LoopEnderRegex);
     const ingredient = matches[1] || undefined;
-    const verb = toPresentTense(matches[2]);
+    const verb = toPastTense(matches[2]);
     return {
       code: "LOOP-CLOSE",
       ing: ingredient,
