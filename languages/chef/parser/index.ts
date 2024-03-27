@@ -193,7 +193,10 @@ const processMethodSegment = (
 
     case "LOOP-CLOSE": {
       // Validate match with innermost loop
-      const loop = loopStack.pop()!;
+      const loop = loopStack.pop();
+      if (!loop) {
+        throw new SyntaxError("No loop opener found");
+      }
       const past = toPastTense(loop.verb);
       if (past !== op.verb)
         throw new SyntaxError(

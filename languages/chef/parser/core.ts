@@ -216,7 +216,7 @@ export const parseMethodStep = (line: string): C.ChefOperation => {
     // `Verb` [the `ingredient`] until `verbed`
     const matches = assertMatch(line, R.LoopEnderRegex);
     const ingredient = matches[1] || undefined;
-    const verb = toPastTense(matches[2]);
+    const verb = matches[2];
     return {
       code: "LOOP-CLOSE",
       ing: ingredient,

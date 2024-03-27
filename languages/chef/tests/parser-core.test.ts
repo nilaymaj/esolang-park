@@ -355,14 +355,14 @@ describe("Parsing method instructions", () => {
   });
 
   test("`Verb` [the `ingredient`] until `verbed`", () => {
-    testMethodOp("Destroy until bake", {
+    testMethodOp("Destroy until baked", {
       code: "LOOP-CLOSE",
-      verb: "bake",
+      verb: "baked",
       opener: JumpAddressPlaceholder,
     });
-    testMethodOp("Destroy the tomato ketchup until bake", {
+    testMethodOp("Destroy the tomato ketchup until baked", {
       code: "LOOP-CLOSE",
-      verb: "bake",
+      verb: "baked",
       ing: "tomato ketchup",
       opener: JumpAddressPlaceholder,
     });
