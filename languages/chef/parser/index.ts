@@ -1,6 +1,6 @@
 import * as T from "../types";
 import { DocumentRange } from "../../types";
-import { parseIngredientItem, parseMethodStep } from "./core";
+import { parseIngredientItem, parseMethodStep, toPastTense } from "./core";
 import { ParseError } from "../../worker-errors";
 import { isSyntaxError, SyntaxError } from "../constants";
 
@@ -193,10 +193,14 @@ const processMethodSegment = (
 
     case "LOOP-CLOSE": {
       // Validate match with innermost loop
-      const loop = loopStack.pop()!;
-      if (loop.verb !== op.verb)
+      const loop = loopStack.pop();
+      if (!loop) {
+        throw new SyntaxError("No loop opener found");
+      }
+      const past = toPastTense(loop.verb);
+      if (past !== op.verb)
         throw new SyntaxError(
-          `Loop verb mismatch: expected '${loop.verb}', found '${op.verb}'`
+          `Loop verb mismatch: expected '${past}', found '${op.verb}'`
         );
 
       op.opener = loop.opener;

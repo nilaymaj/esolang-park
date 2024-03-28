@@ -11,16 +11,13 @@ import * as R from "./regex";
 import * as C from "../types";
 
 /**
- * Ideally, this would convert past form of verb to present form. Due to
- * the requirement of an English dictionary for sufficient accuracy, we instead
- * require the past form to be the same as present form in Esolang Park. Thus,
- * this function is currently a no-op.
+ * Converts a verb to the past tense version of it
  *
- * @param verbed Past form of verb
- * @returns Present imperative form of verb
+ * @param verb Present form of verb
+ * @returns Past form of verb
  */
-const toPresentTense = (verbed: string) => {
-  return verbed;
+export const toPastTense = (verb: string) => {
+  return verb.endsWith('e') ? verb + "d" : verb + "ed"
 };
 
 /** Parse a string as an ingredient measure */
@@ -219,7 +216,7 @@ export const parseMethodStep = (line: string): C.ChefOperation => {
     // `Verb` [the `ingredient`] until `verbed`
     const matches = assertMatch(line, R.LoopEnderRegex);
     const ingredient = matches[1] || undefined;
-    const verb = toPresentTense(matches[2]);
+    const verb = matches[2];
     return {
       code: "LOOP-CLOSE",
       ing: ingredient,
