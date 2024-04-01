@@ -7,6 +7,8 @@ import {
   WorkerRuntimeError,
 } from "./worker-errors";
 
+const FORCE_SLEEP_INTERVAL_MS = 10;
+
 type ExecuteAllArgs<RS> = {
   /** Interval between two execution steps, in milliseconds */
   interval: number;
@@ -143,12 +145,27 @@ class ExecutionController<RS> {
     this._isPaused = false;
 
     return new Promise(async (resolve, reject) => {
+      let lastSleepTime = performance.now();
+
       while (true) {
         try {
           const doBreak = this.runExecLoopIteration();
           onResult(this._result!);
           if (doBreak) break;
-          await this.sleep(interval);
+
+          /**
+           * The event loop causes sleep to add quite a bit of overhead. But sleep is
+           * required for allowing other message handlers to be run during execution.
+           * So for interval=0, as a middle ground, we sleep after every X ms.
+           */
+
+          const shouldSleep =
+            interval > 0 ||
+            performance.now() - lastSleepTime > FORCE_SLEEP_INTERVAL_MS;
+          if (shouldSleep) {
+            await this.sleep(interval);
+            lastSleepTime = performance.now();
+          }
         } catch (error) {
           if (isRuntimeError(error)) {
             this._isPaused = true;
