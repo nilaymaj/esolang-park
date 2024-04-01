@@ -38,7 +38,7 @@ const IntervalInput = (props: {
   return (
     <div style={styles.inputWrapper}>
       <NumericInput
-        min={5}
+        min={0}
         stepSize={5}
         defaultValue={20}
         minorStepSize={null}
