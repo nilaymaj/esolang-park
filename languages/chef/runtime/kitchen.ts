@@ -166,7 +166,7 @@ export default class ChefKitchen {
     if (bowl.length === 0) throw new RuntimeError(`Bowl ${bowlId} is empty`);
     const bowlValue = bowl.pop()!.value;
     const ingValue = this.getIngredient(ingredient, true).value as number;
-    bowl.push({ type: "unknown", value: bowlValue / ingValue });
+    bowl.push({ type: "unknown", value: Math.trunc(bowlValue / ingValue) });
   }
 
   /** Add values of all dry ingredients and push onto a mixing bowl */
