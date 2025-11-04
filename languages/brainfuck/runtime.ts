@@ -11,7 +11,7 @@ const DEFAULT_TAPE = (): { [k: number]: number } => ({});
 const DEFAULT_INPUT: string = "";
 
 /* Value boundaries for Brainfuck cells */
-const VALUE_WINDOW = {min: -128, max: 127};
+const VALUE_WINDOW = {min: 0, max: 255};
 
 // Instruction characters
 const OP_CHARS = Object.values(BF_OP);
