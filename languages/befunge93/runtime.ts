@@ -282,7 +282,7 @@ export default class Befunge93LanguageEngine
       case Bfg93Op.GET_DATA: {
         const y = this.popStack();
         const x = this.popStack();
-        const char = this.getGridCell(x, y);
+        const char = this.getGridCell(x, y, '\0');
         this.pushStack(char.charCodeAt(0));
         break;
       }
@@ -330,12 +330,13 @@ export default class Befunge93LanguageEngine
 
   /**
    * Get character at position (x, y) of program grid.
-   * Throws RuntimeError if (x, y) is out of bounds.
+   * Throws RuntimeError if (x, y) is out of bounds, unless a default value is provided.
    */
-  private getGridCell(x: number, y: number): string {
-    if (!this.isInGrid(x, y))
-      throw new RuntimeError("Coordinates out of bounds");
-    else return this._ast[y][x];
+  private getGridCell(x: number, y: number, defaultValue?: string): string {
+    if (!this.isInGrid(x, y)) {
+      if (defaultValue !== undefined) return defaultValue;
+      else throw new RuntimeError(`Coordinates (${x}, ${y}) out of bounds`);
+    } else return this._ast[y][x];
   }
 
   /**
@@ -344,7 +345,7 @@ export default class Befunge93LanguageEngine
    */
   private setGridCell(x: number, y: number, asciiVal: number): DocumentEdit {
     if (!this.isInGrid(x, y))
-      throw new RuntimeError("Coordinates out of bound");
+      throw new RuntimeError(`Coordinates (${x}, ${y}) out of bounds`);
 
     // Change character at position (x, y)
     this._ast[y] =
