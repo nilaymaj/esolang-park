@@ -10,6 +10,9 @@ const DEFAULT_PC = -1;
 const DEFAULT_TAPE = (): { [k: number]: number } => ({});
 const DEFAULT_INPUT: string = "";
 
+/* Value boundaries for Brainfuck cells */
+const VALUE_WINDOW = {min: -128, max: 127};
+
 // Instruction characters
 const OP_CHARS = Object.values(BF_OP);
 
@@ -175,14 +178,14 @@ export default class BrainfuckLanguageEngine implements LanguageEngine<BFRS> {
   private incrementCell(cellId: number): void {
     if (!this._tape[cellId]) this._tape[cellId] = 0;
     this._tape[cellId] += 1;
-    if (this._tape[cellId] === 128) this._tape[cellId] = -128;
+    if (this._tape[cellId] === VALUE_WINDOW.max + 1) this._tape[cellId] = VALUE_WINDOW.min;
   }
 
   /** Decrement tape cell at specified location */
   private decrementCell(cellId: number): void {
     if (!this._tape[cellId]) this._tape[cellId] = 0;
     this._tape[cellId] -= 1;
-    if (this._tape[cellId] === -129) this._tape[cellId] = 127;
+    if (this._tape[cellId] === VALUE_WINDOW.min - 1) this._tape[cellId] = VALUE_WINDOW.max;
   }
 
   /** Move the tape pointer one cell to the right */
