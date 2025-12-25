@@ -57,8 +57,8 @@ export enum Bfg93Op {
 
 /** Sample program printing "Hello world" */
 export const sampleProgram = [
-  `"!dlroW ,olleH">:v`,
-  `               |,<`,
+  `"!dlroW ,olleH">,v`,
+  `               |:<`,
   `               @`,
 ].join("\n");
 
